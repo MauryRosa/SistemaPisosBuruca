@@ -1,0 +1,61 @@
+/* =============================================================
+   Tokens de diseño · Propuesta UX/UI Pisos Buruca
+   Un color = un significado. Todo el sistema usa estas variables.
+   ============================================================= */
+:root {
+  /* Marca */
+  --primary: #c0282d;
+  --primary-hover: #a02024;
+  --sidebar: #3a3f45;
+  --success: #2f7d43;
+  --text: #26292c;
+
+  /* Superficies */
+  --bg: #f6f4ef;
+  --surface: #ffffff;
+  --surface-alt: #efece5;
+  --border: #dad6cc;
+  --text-muted: #5e6369;
+  --icon-muted: #6b7178;
+
+  /* Estados */
+  --success-bg: #e4f2e7;
+  --success-text: #24683a;
+  --danger-bg: #fbe9e9;
+  --danger-text: #a02024;
+  --pending: #b7791f;
+  --pending-bg: #fbf1dc;
+  --pending-text: #8a5a12;
+  --neutral-bg: #efece5;
+  --neutral-text: #5e6369;
+
+  /* Tipografía */
+  --font: 'Inter', system-ui, Arial, sans-serif;
+  --fs-h1: 1.5rem; /* 24 px */
+  --fs-h2: 1.25rem; /* 20 px */
+  --fs-h3: 1rem; /* 16 px */
+  --fs-body: 1rem; /* 16 px */
+  --fs-label: 0.875rem; /* 14 px */
+  --fs-stat: 1.75rem; /* 28 px */
+  --lh-body: 1.5;
+  --lh-title: 1.2;
+
+  /* Espaciado (escala de 4 px) */
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 24px;
+  --sp-6: 32px;
+
+  /* Forma */
+  --radius: 8px;
+  --radius-lg: 12px;
+  --shadow: 0 1px 2px rgb(38 41 44 / 6%), 0 1px 3px rgb(38 41 44 / 8%);
+  --touch: 48px;
+
+  /* Layout */
+  --sidebar-w: 248px;
+  --sidebar-w-compact: 72px;
+  --topbar-h: 64px;
+}
