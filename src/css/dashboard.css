@@ -1,0 +1,19 @@
+/* P14 · Inicio (administrador) / Panel del jefe de bodega */
+.accesos { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-3); }
+.acceso { display: flex; flex-direction: column; align-items: flex-start; justify-content: center; gap: var(--sp-2); min-height: 88px; padding: var(--sp-4); border-radius: var(--radius-lg); background: var(--surface); border: 1px solid var(--border); font-weight: 600; }
+.acceso:hover { border-color: var(--primary); }
+.acceso--principal { grid-column: 1 / -1; background: var(--primary); border-color: var(--primary); color: #fff; }
+.acceso--principal:hover { background: var(--primary-hover); }
+.resumen { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--sp-3); }
+.resumen .stat-card { flex-direction: column; align-items: flex-start; gap: var(--sp-2); padding: var(--sp-4); }
+.table td.num { white-space: nowrap; }
+.paneles { display: grid; grid-template-columns: 1fr; gap: var(--sp-5); }
+.lista { list-style: none; padding: 0; }
+.lista__item { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--sp-2) var(--sp-3); padding: var(--sp-3) var(--sp-5); border-top: 1px solid var(--border); }
+.lista__item:first-child { border-top: 0; }
+.lista__principal { min-width: 0; flex: 1; }
+.lista__titulo { font-weight: 600; }
+.lista__meta { font-size: var(--fs-label); color: var(--text-muted); }
+.lista__accion { font-size: var(--fs-label); font-weight: 600; color: var(--primary); white-space: nowrap; }
+@media (min-width: 768px) { .resumen .stat-card { flex-direction: row; align-items: center; gap: var(--sp-4); padding: var(--sp-4) var(--sp-5); } .accesos { grid-template-columns: repeat(3, 1fr); } .acceso--principal { grid-column: auto; } }
+@media (min-width: 1280px) { .resumen { grid-template-columns: repeat(4, 1fr); } .paneles { grid-template-columns: 1fr 1fr; } .paneles .panel--ancho { grid-column: 1 / -1; } }

@@ -55,3 +55,11 @@ h3 {
   white-space: nowrap;
   border: 0;
 }
+
+.capitalizar {
+  display: inline-block;
+}
+
+.capitalizar::first-letter {
+  text-transform: uppercase;
+}
