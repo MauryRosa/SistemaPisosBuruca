@@ -1,0 +1,21 @@
+# Dependencias y compilación
+node_modules/
+dist/
+coverage/
+
+# Variables de entorno: NUNCA subir claves al repositorio
+.env
+.env.local
+.env.*.local
+variablesDB.txt
+
+# Supabase local
+supabase/.branches/
+supabase/.temp/
+
+# Sistema y editores
+.DS_Store
+Thumbs.db
+.vscode/*
+!.vscode/extensions.json
+*.log
