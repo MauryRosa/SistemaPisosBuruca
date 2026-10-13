@@ -1,0 +1,147 @@
+/* =============================================================
+   P03 · Consulta de stock
+   ============================================================= */
+.filtros {
+  position: sticky;
+  top: var(--topbar-h);
+  z-index: 5;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--sp-3);
+  padding: var(--sp-3) 0;
+  background: var(--bg);
+}
+
+.filtros__busqueda {
+  position: relative;
+}
+
+.filtros__busqueda svg {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--icon-muted);
+  pointer-events: none;
+}
+
+.filtros__busqueda .input {
+  padding-left: 44px;
+}
+
+.filtros__fila {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--sp-3);
+}
+
+.filtros__check {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  min-height: var(--touch);
+  font-size: var(--fs-label);
+}
+
+.filtros__check input {
+  width: 20px;
+  height: 20px;
+  accent-color: var(--primary);
+}
+
+select.input {
+  appearance: none;
+  padding-right: 40px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%235E6369' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+}
+
+.stock__resumen {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: var(--sp-2);
+  padding: var(--sp-3) var(--sp-4);
+  font-size: var(--fs-label);
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border);
+}
+
+.stock__vivo {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-1);
+}
+
+.stock__vivo::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--success);
+}
+
+.producto__nombre {
+  font-weight: 600;
+}
+
+.producto__meta {
+  font-size: var(--fs-label);
+  color: var(--text-muted);
+}
+
+.cantidad {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Si la tabla no cabe, se desplaza dentro de su tarjeta y no la página */
+.tabla-scroll {
+  overflow-x: auto;
+}
+
+.cantidad--disponible {
+  font-weight: 700;
+  color: var(--success-text);
+}
+
+.cantidad--cero {
+  color: var(--danger-text);
+}
+
+@media (max-width: 767px) {
+  .stock-tabla td:first-child {
+    display: block;
+    text-align: left;
+    padding-bottom: var(--sp-2);
+  }
+}
+
+@media (min-width: 768px) {
+  .filtros {
+    grid-template-columns: 1fr 1fr auto;
+    align-items: center;
+  }
+
+  .filtros__busqueda {
+    grid-column: 1 / -1;
+  }
+
+  .filtros__fila {
+    display: contents;
+  }
+}
+
+@media (min-width: 1280px) {
+  .filtros {
+    grid-template-columns: minmax(240px, 1.6fr) minmax(230px, 1fr) minmax(230px, 1fr) auto;
+  }
+
+  .filtros__busqueda {
+    grid-column: auto;
+  }
+
+  .cantidad {
+    white-space: nowrap;
+  }
+}

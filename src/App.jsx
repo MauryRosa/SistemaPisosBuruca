@@ -3,12 +3,15 @@ import ProtectedRoute from './components/layout/ProtectedRoute.jsx';
 import AppLayout from './components/layout/AppLayout.jsx';
 import Login from './pages/Login.jsx';
 import EnConstruccion from './pages/EnConstruccion.jsx';
+import ConsultaStock from './pages/ConsultaStock.jsx';
 import { RUTAS } from './config/menu.js';
 import { useAuth } from './context/useAuth.js';
 import { INICIO_POR_ROL } from './lib/roles.js';
 
 // Pantallas ya implementadas; el resto muestra "En construcción"
-const PANTALLAS = {};
+const PANTALLAS = {
+  '/stock': ConsultaStock,
+};
 
 function InicioSegunRol() {
   const { perfil } = useAuth();
