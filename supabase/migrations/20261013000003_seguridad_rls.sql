@@ -2,8 +2,10 @@
 -- Migración 3: Row Level Security por rol
 -- administrador: todo · jefe_bodega: registra movimientos
 -- vendedora: consulta stock y crea órdenes de pedido
--- Las existencias y los correlativos solo cambian mediante
--- funciones de movimiento (se agregan en migraciones futuras).
+-- Documentos, sus líneas, existencias y correlativos NO se escriben
+-- directamente desde la aplicación: solo mediante funciones de
+-- movimiento SECURITY DEFINER (se agregan en migraciones futuras),
+-- que fijan el estado y la aprobación en el servidor.
 -- =============================================================
 
 alter table public.usuarios enable row level security;
@@ -61,6 +63,8 @@ create policy reservas_crear on public.reservas for insert to authenticated
   with check (
     (select private.rol_actual()) in ('administrador', 'jefe_bodega')
     and creado_por = (select auth.uid())
+    and estado = 'activa'
+    and documento_id is null
   );
 create policy reservas_editar on public.reservas for update to authenticated
   using ((select private.rol_actual()) in ('administrador', 'jefe_bodega'))
@@ -72,6 +76,7 @@ create policy ordenes_pedido_crear on public.ordenes_pedido for insert to authen
   with check (
     (select private.rol_actual()) in ('administrador', 'vendedora')
     and creado_por = (select auth.uid())
+    and estado = 'abierta'
   );
 create policy ordenes_pedido_editar on public.ordenes_pedido for update to authenticated
   using ((select private.rol_actual()) in ('administrador', 'jefe_bodega'))
@@ -79,27 +84,33 @@ create policy ordenes_pedido_editar on public.ordenes_pedido for update to authe
 
 create policy detalle_op_leer on public.detalle_orden_pedido for select to authenticated using (true);
 create policy detalle_op_crear on public.detalle_orden_pedido for insert to authenticated
-  with check ((select private.rol_actual()) in ('administrador', 'vendedora'));
+  with check (
+    cantidad_recibida = 0
+    and exists (
+      select 1 from public.ordenes_pedido op
+      where op.id = orden_pedido_id
+        and op.estado = 'abierta'
+        and op.creado_por = (select auth.uid())
+    )
+  );
 create policy detalle_op_editar on public.detalle_orden_pedido for update to authenticated
   using ((select private.rol_actual()) in ('administrador', 'jefe_bodega'))
   with check ((select private.rol_actual()) in ('administrador', 'jefe_bodega'));
 
--- ---------- Documentos: administrador y jefe de bodega ----------
+-- ---------- Documentos: lectura para administrador y jefe de bodega ----------
+-- Sin políticas de inserción: se crean solo con funciones de movimiento.
 create policy documentos_leer on public.documentos for select to authenticated
   using ((select private.rol_actual()) in ('administrador', 'jefe_bodega'));
-create policy documentos_crear on public.documentos for insert to authenticated
-  with check (
-    (select private.rol_actual()) in ('administrador', 'jefe_bodega')
-    and creado_por = (select auth.uid())
-  );
+-- El administrador aprueba, rechaza o anula; queda registrado como quien aprobó
 create policy documentos_aprobar on public.documentos for update to authenticated
   using ((select private.rol_actual()) = 'administrador')
-  with check ((select private.rol_actual()) = 'administrador');
+  with check (
+    (select private.rol_actual()) = 'administrador'
+    and (aprobado_por is null or aprobado_por = (select auth.uid()))
+  );
 
 create policy detalle_documento_leer on public.detalle_documento for select to authenticated
   using ((select private.rol_actual()) in ('administrador', 'jefe_bodega'));
-create policy detalle_documento_crear on public.detalle_documento for insert to authenticated
-  with check ((select private.rol_actual()) in ('administrador', 'jefe_bodega'));
 
 -- ---------- Conteos ----------
 create policy conteos_leer on public.conteos for select to authenticated
@@ -108,6 +119,8 @@ create policy conteos_crear on public.conteos for insert to authenticated
   with check (
     (select private.rol_actual()) in ('administrador', 'jefe_bodega')
     and creado_por = (select auth.uid())
+    and estado = 'pendiente'
+    and documento_ajuste_id is null
   );
 create policy conteos_editar on public.conteos for update to authenticated
   using ((select private.rol_actual()) = 'administrador')
@@ -116,7 +129,14 @@ create policy conteos_editar on public.conteos for update to authenticated
 create policy detalle_conteo_leer on public.detalle_conteo for select to authenticated
   using ((select private.rol_actual()) in ('administrador', 'jefe_bodega'));
 create policy detalle_conteo_crear on public.detalle_conteo for insert to authenticated
-  with check ((select private.rol_actual()) in ('administrador', 'jefe_bodega'));
+  with check (
+    exists (
+      select 1 from public.conteos c
+      where c.id = conteo_id
+        and c.estado = 'pendiente'
+        and c.creado_por = (select auth.uid())
+    )
+  );
 
 -- ---------- Bitácora: solo el administrador la lee; nadie la edita (RNF-13) ----------
 create policy bitacora_leer on public.bitacora for select to authenticated

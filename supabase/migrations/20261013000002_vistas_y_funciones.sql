@@ -181,3 +181,27 @@ $$;
 
 create trigger documentos_proteger before update or delete on public.documentos
   for each row execute function private.proteger_documento();
+
+-- ---------- Las líneas de un documento solo cambian mientras está pendiente ----------
+create or replace function private.proteger_detalle_documento()
+returns trigger
+language plpgsql
+set search_path = ''
+as $$
+declare
+  estado_padre public.estado_documento;
+begin
+  select d.estado into estado_padre
+  from public.documentos d
+  where d.id = coalesce(new.documento_id, old.documento_id);
+
+  if estado_padre is distinct from 'pendiente' then
+    raise exception 'Las líneas de un documento % no se pueden modificar.', coalesce(estado_padre::text, 'inexistente');
+  end if;
+  return coalesce(new, old);
+end;
+$$;
+
+create trigger detalle_documento_proteger before insert or update or delete on public.detalle_documento
+  for each row execute function private.proteger_detalle_documento();
+

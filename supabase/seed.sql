@@ -78,15 +78,18 @@ insert into public.correlativos (serie, anio, ultimo_numero) values
   ('VTA', extract(year from now())::int, 2),
   ('MER', extract(year from now())::int, 1);
 
+-- Flujo real: el documento nace pendiente, se agregan sus líneas y luego se aprueba
 insert into public.documentos (tipo, serie, anio, correlativo, doc_venta_tipo, doc_venta_numero, estado, creado_por, retira_nombre)
 values
-  ('salida_venta', 'VTA', extract(year from now())::int, 1, 'factura', 'F-1001', 'aprobado', '22222222-2222-2222-2222-222222222222', 'Cliente demo'),
-  ('salida_venta', 'VTA', extract(year from now())::int, 2, 'recibo', 'R-2045', 'aprobado', '22222222-2222-2222-2222-222222222222', 'Transportista demo');
+  ('salida_venta', 'VTA', extract(year from now())::int, 1, 'factura', 'F-1001', 'pendiente', '22222222-2222-2222-2222-222222222222', 'Cliente demo'),
+  ('salida_venta', 'VTA', extract(year from now())::int, 2, 'recibo', 'R-2045', 'pendiente', '22222222-2222-2222-2222-222222222222', 'Transportista demo');
 insert into public.documentos (tipo, serie, anio, correlativo, estado, motivo, creado_por)
 values ('merma', 'MER', extract(year from now())::int, 1, 'pendiente', 'Caja quebrada al descargar', '22222222-2222-2222-2222-222222222222');
 
 insert into public.detalle_documento (documento_id, producto_id, ubicacion_origen_id, cantidad) values
   (1, 1, 1, 21), (2, 6, 1, 5), (3, 2, 1, 2);
+
+update public.documentos set estado = 'aprobado' where id in (1, 2);
 
 -- ---------- Reserva de ejemplo ----------
 insert into public.reservas (producto_id, ubicacion_id, cantidad, vendedora_id, doc_venta_tipo, doc_venta_numero, creado_por)
