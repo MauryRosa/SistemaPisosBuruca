@@ -16,7 +16,7 @@ La fuente oficial `RequerimientosDeSistema.pdf` fija 41 RF y 17 RNF. `Modelo de 
 | RF-06 | Ubicaciones tipo bodega y minibodega, inicializadas para desarrollo en `supabase/seed.sql`. |
 | RF-07 | Existencias por producto y ubicación; consulta en `v_stock`. |
 | RF-08 | Altas de ubicaciones configurables en `Ubicaciones.jsx` y `useUbicaciones.js`. |
-| RF-09 | Creación y cierre de órdenes por administración y ventas en `Pedidos.jsx`; correlativos y validación transaccional en `20261114105835_pedidos_con_correlativo.sql`. |
+| RF-09 | Creación y cierre de órdenes por administración y ventas en `Pedidos.jsx`; el historial permite buscar y recorrer todas las órdenes. Correlativos y validación transaccional en `20261114105835_pedidos_con_correlativo.sql`. |
 | RF-10 | Recepción ligada a la orden y al número de factura o remisión en `Entradas.jsx` y `registrar_movimiento_core`. |
 | RF-11 | Cantidades solicitadas/recibidas, faltantes, sobrantes y observaciones en `Entradas.jsx`; la base exige observación al exceder la orden (`20261114124108_require_observation_for_purchase_overage.sql`). |
 | RF-12 | Captura de cajas y piezas convertida a unidad base en `Entradas.jsx` y `src/lib/unidades.js`. |
@@ -70,7 +70,7 @@ La fuente oficial `RequerimientosDeSistema.pdf` fija 41 RF y 17 RNF. `Modelo de 
 | RNF-12 | Pendiente configurar respaldos diarios y guardar evidencia de una restauración mensual. |
 | RNF-13 | Las mutaciones de bitácora están restringidas al rol de aplicación; la retención verificable de cinco años depende de respaldos y política operativa. |
 | RNF-14 | Pendiente revisión real de compañeros en PR. Las autorías no se asignan a personas que no hayan hecho el trabajo. |
-| RNF-15 | Stock, conteos, proveedores, catálogos de entradas/pedidos/salidas/traslados/reportes, historial de reservas y colas de aprobación recorren resultados por páginas para evitar límites fijos de filas. Pendiente medir crecimiento y rendimiento con volumen representativo; no hay evidencia para afirmar escalabilidad en producción. |
+| RNF-15 | Stock, conteos, proveedores, catálogos de entradas/pedidos/salidas/traslados/reportes, historial de reservas, órdenes y colas de aprobación recorren resultados por páginas para evitar límites fijos de filas. Pendiente medir crecimiento y rendimiento con volumen representativo; no hay evidencia para afirmar escalabilidad en producción. |
 | RNF-16 | CSV implementado; integración con facturación queda fuera del alcance de esta versión. |
 | RNF-17 | Código y dependencias de código abierto; falta elegir proveedor/plan y documentar el costo operativo real. |
 

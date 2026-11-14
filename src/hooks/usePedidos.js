@@ -2,9 +2,12 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '../lib/supabase.js';
 import { consultarTodas } from '../lib/consultarTodas.js';
 
-function comprobar(resultado) {
-  if (resultado.error) throw resultado.error;
-  return resultado.data || [];
+function dividirEnGrupos(valores, tamano = 200) {
+  const grupos = [];
+  for (let inicio = 0; inicio < valores.length; inicio += tamano) {
+    grupos.push(valores.slice(inicio, inicio + tamano));
+  }
+  return grupos;
 }
 
 export function useCatalogosPedido() {
@@ -33,37 +36,41 @@ export function useCatalogosPedido() {
 }
 
 async function consultarPedidos() {
-  const { data: ordenes, error } = await supabase
+  const ordenes = await consultarTodas(() => supabase
     .from('ordenes_pedido')
     .select('id,numero,fecha,fecha_estimada,estado,motivo_cierre,proveedor_id,creado_por')
     .order('fecha', { ascending: false })
-    .order('id', { ascending: false })
-    .limit(100);
-  if (error) throw error;
+    .order('id', { ascending: false }));
   if (ordenes.length === 0) return [];
 
   const ordenIds = ordenes.map((orden) => orden.id);
-  const proveedorIds = [...new Set(ordenes.map((orden) => orden.proveedor_id))];
-  const usuarioIds = [...new Set(ordenes.map((orden) => orden.creado_por))];
-  const [proveedoresResultado, usuariosResultado, detallesResultado] = await Promise.all([
-    supabase.from('proveedores').select('id,nombre,contacto,telefono,correo').in('id', proveedorIds),
-    supabase.from('v_usuarios_nombres_operativos').select('id,nombre').in('id', usuarioIds),
-    supabase
+  const proveedorIds = [...new Set(ordenes.map((orden) => orden.proveedor_id).filter(Boolean))];
+  const usuarioIds = [...new Set(ordenes.map((orden) => orden.creado_por).filter(Boolean))];
+  const [bloquesProveedores, bloquesUsuarios, bloquesDetalles] = await Promise.all([
+    Promise.all(dividirEnGrupos(proveedorIds).map((ids) => consultarTodas(() => supabase.from('proveedores')
+      .select('id,nombre,contacto,telefono,correo')
+      .in('id', ids)
+      .order('id')))),
+    Promise.all(dividirEnGrupos(usuarioIds).map((ids) => consultarTodas(() => supabase.from('v_usuarios_nombres_operativos')
+      .select('id,nombre')
+      .in('id', ids)
+      .order('id')))),
+    Promise.all(dividirEnGrupos(ordenIds).map((ids) => consultarTodas(() => supabase
       .from('detalle_orden_pedido')
       .select('id,orden_pedido_id,producto_id,cantidad,cantidad_recibida')
-      .in('orden_pedido_id', ordenIds)
-      .order('id'),
+      .in('orden_pedido_id', ids)
+      .order('id')))),
   ]);
-  const proveedores = comprobar(proveedoresResultado);
-  const usuarios = comprobar(usuariosResultado);
-  const detalles = comprobar(detallesResultado);
+  const proveedores = bloquesProveedores.flat();
+  const usuarios = bloquesUsuarios.flat();
+  const detalles = bloquesDetalles.flat();
   const productoIds = [...new Set(detalles.map((detalle) => detalle.producto_id))];
-  const productos = productoIds.length
-    ? comprobar(await supabase
-      .from('productos')
-      .select('id,codigo,nombre,tipo,unidad,piezas_por_caja')
-      .in('id', productoIds))
-    : [];
+  const bloquesProductos = await Promise.all(dividirEnGrupos(productoIds).map((ids) => consultarTodas(() => supabase
+    .from('productos')
+    .select('id,codigo,nombre,tipo,unidad,piezas_por_caja')
+    .in('id', ids)
+    .order('id'))));
+  const productos = bloquesProductos.flat();
 
   const porProveedor = new Map(proveedores.map((proveedor) => [proveedor.id, proveedor]));
   const porUsuario = new Map(usuarios.map((usuario) => [usuario.id, usuario.nombre]));

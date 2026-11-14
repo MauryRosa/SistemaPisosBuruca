@@ -93,6 +93,22 @@
   gap: var(--sp-4);
 }
 
+.pedidos__resumen {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: var(--fs-label);
+}
+
+.pedidos__paginacion {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: var(--sp-3);
+  color: var(--text-muted);
+  font-size: var(--fs-label);
+}
+
 .pedidos__tarjeta {
   padding: var(--sp-5);
 }

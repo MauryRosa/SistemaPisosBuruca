@@ -17,6 +17,7 @@ const ESTADOS = [
   ['parcial', 'Recibidas parcialmente'],
   ['cerrada', 'Cerradas'],
 ];
+const TAMANO_PAGINA_PEDIDOS = 20;
 
 function fecha(valor) {
   if (!valor) return 'Sin fecha estimada';
@@ -45,6 +46,7 @@ export default function Pedidos() {
   const [lineas, setLineas] = useState([nuevaLinea()]);
   const [estadoFiltro, setEstadoFiltro] = useState('todas');
   const [busqueda, setBusqueda] = useState('');
+  const [pagina, setPagina] = useState(0);
   const [cierre, setCierre] = useState(null);
   const [mensaje, setMensaje] = useState(null);
   const [imprimirId, setImprimirId] = useState(null);
@@ -68,6 +70,12 @@ export default function Pedidos() {
     const texto = `${pedido.numero} ${pedido.proveedor?.nombre || ''}`.toLocaleLowerCase('es');
     return coincideEstado && texto.includes(busqueda.trim().toLocaleLowerCase('es'));
   });
+  const paginas = Math.ceil(pedidosFiltrados.length / TAMANO_PAGINA_PEDIDOS);
+  const paginaActual = Math.min(pagina, Math.max(0, paginas - 1));
+  const pedidosVisibles = pedidosFiltrados.slice(
+    paginaActual * TAMANO_PAGINA_PEDIDOS,
+    (paginaActual + 1) * TAMANO_PAGINA_PEDIDOS,
+  );
 
   const guardando = crear.isPending || cerrar.isPending;
   const lineasValidas = lineas.every((linea) => {
@@ -335,13 +343,19 @@ export default function Pedidos() {
             className="input"
             type="search"
             value={busqueda}
-            onChange={(event) => setBusqueda(event.target.value)}
+            onChange={(event) => {
+              setBusqueda(event.target.value);
+              setPagina(0);
+            }}
             placeholder="OP-2026-00001"
           />
         </label>
         <label className="field">
           <span className="field__label">Estado</span>
-          <select className="input" value={estadoFiltro} onChange={(event) => setEstadoFiltro(event.target.value)}>
+          <select className="input" value={estadoFiltro} onChange={(event) => {
+            setEstadoFiltro(event.target.value);
+            setPagina(0);
+          }}>
             {ESTADOS.map(([valor, texto]) => <option key={valor} value={valor}>{texto}</option>)}
           </select>
         </label>
@@ -360,8 +374,12 @@ export default function Pedidos() {
       )}
 
       {!isLoading && !isError && pedidosFiltrados.length > 0 && (
-        <div className="pedidos__lista">
-          {pedidosFiltrados.map((pedido) => (
+        <>
+          <p className="pedidos__resumen" aria-live="polite">
+            Mostrando {paginaActual * TAMANO_PAGINA_PEDIDOS + 1}–{Math.min((paginaActual + 1) * TAMANO_PAGINA_PEDIDOS, pedidosFiltrados.length)} de {pedidosFiltrados.length} órdenes
+          </p>
+          <div className="pedidos__lista">
+          {pedidosVisibles.map((pedido) => (
             <article className={`card pedidos__tarjeta${imprimirId === pedido.id ? ' pedidos__tarjeta--imprimir' : ''}`} key={pedido.id}>
               <header className="pedidos__tarjeta-cabecera">
                 <div>
@@ -445,7 +463,19 @@ export default function Pedidos() {
               )}
             </article>
           ))}
-        </div>
+          </div>
+          {paginas > 1 && (
+            <nav className="pedidos__paginacion" aria-label="Paginación de órdenes">
+              <button type="button" className="btn btn--secondary" onClick={() => setPagina(paginaActual - 1)} disabled={paginaActual === 0}>
+                Anterior
+              </button>
+              <span>Página {paginaActual + 1} de {paginas}</span>
+              <button type="button" className="btn btn--secondary" onClick={() => setPagina(paginaActual + 1)} disabled={paginaActual + 1 >= paginas}>
+                Siguiente
+              </button>
+            </nav>
+          )}
+        </>
       )}
     </section>
   );
