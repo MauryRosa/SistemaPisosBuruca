@@ -33,7 +33,7 @@ La fuente oficial `RequerimientosDeSistema.pdf` fija 41 RF y 17 RNF. `Modelo de 
 | RF-23 | Devolución a proveedor ligada a la recepción original y al documento del proveedor; la base valida producto, ubicación y cantidad acumulada frente a la recepción (`20261114140137_validar_devolucion_proveedor.sql`). |
 | RF-24 | Cambio captura devolución y reemplazo dentro de una sola llamada transaccional. |
 | RF-25 | Anulación con motivo y movimiento inverso; se pueden localizar todos los documentos anulables y los casos no reversibles se bloquean en `20261114105810_anulaciones_y_apertura_caja.sql`. |
-| RF-26 | Jefatura de bodega crea reservas para una vendedora en `Reservas.jsx`; el historial y los catálogos asociados recuperan todos los registros por páginas. |
+| RF-26 | Jefatura de bodega crea reservas para una vendedora en `Reservas.jsx`; el historial y los catálogos asociados recuperan todos los registros por páginas y resuelven usuarios, productos y ubicaciones por lotes. |
 | RF-27 | La vista de stock calcula disponible como físico menos reservas activas; `v_reservas_stock_activas` entrega solo totales a perfiles activos y mantiene privadas las filas de reservas. |
 | RF-28 | Despacho consume la reserva coincidente; cancelación requiere motivo. |
 | RF-29 | Correlativos de servidor por serie/año, iniciados en 00001, mediante `correlativos`. |

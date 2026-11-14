@@ -1,11 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '../lib/supabase.js';
-import { consultarTodas } from '../lib/consultarTodas.js';
-
-function comprobar(resultado) {
-  if (resultado.error) throw resultado.error;
-  return resultado.data || [];
-}
+import { consultarPorIds, consultarTodas } from '../lib/consultarTodas.js';
 
 export function useCatalogoReservas() {
   return useQuery({
@@ -61,14 +56,17 @@ async function consultarReservas() {
   const usuarioIds = [...new Set(reservas.flatMap((reserva) => [reserva.vendedora_id, reserva.creado_por]).filter(Boolean))];
   const productoIds = [...new Set(reservas.map((reserva) => reserva.producto_id))];
   const ubicacionIds = [...new Set(reservas.map((reserva) => reserva.ubicacion_id))];
-  const [usuariosResultado, productosResultado, ubicacionesResultado] = await Promise.all([
-    supabase.from('v_usuarios_nombres_operativos').select('id,nombre').in('id', usuarioIds),
-    supabase.from('productos').select('id,codigo,nombre,tipo,unidad,piezas_por_caja').in('id', productoIds),
-    supabase.from('ubicaciones').select('id,nombre').in('id', ubicacionIds),
+  const [usuarios, productos, ubicaciones] = await Promise.all([
+    consultarPorIds(usuarioIds, (ids) => supabase.from('v_usuarios_nombres_operativos')
+      .select('id,nombre')
+      .in('id', ids)),
+    consultarPorIds(productoIds, (ids) => supabase.from('productos')
+      .select('id,codigo,nombre,tipo,unidad,piezas_por_caja')
+      .in('id', ids)),
+    consultarPorIds(ubicacionIds, (ids) => supabase.from('ubicaciones')
+      .select('id,nombre')
+      .in('id', ids)),
   ]);
-  const usuarios = comprobar(usuariosResultado);
-  const productos = comprobar(productosResultado);
-  const ubicaciones = comprobar(ubicacionesResultado);
   const porUsuario = new Map(usuarios.map((usuario) => [usuario.id, usuario.nombre]));
   const porProducto = new Map(productos.map((producto) => [producto.id, producto]));
   const porUbicacion = new Map(ubicaciones.map((ubicacion) => [ubicacion.id, ubicacion.nombre]));
