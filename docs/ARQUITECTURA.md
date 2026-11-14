@@ -16,7 +16,9 @@ SistemaPisosBuruca/
 ├── .gitignore               Excluye node_modules, dist, .env y claves
 ├── README.md                Descripción, integrantes, beneficiario y cómo ejecutar
 ├── docs/
-│   └── ARQUITECTURA.md      Este documento
+│   ├── ARQUITECTURA.md      Este documento
+│   ├── COBERTURA-REQUERIMIENTOS.md RF y RNF frente a la implementación
+│   └── PUESTA-EN-MARCHA.md  Desarrollo local y cierre de producción
 ├── public/
 │   ├── favicon.svg
 │   └── img/                 Imágenes estáticas (logo oficial, fotos)
@@ -41,6 +43,7 @@ SistemaPisosBuruca/
 └── supabase/
     ├── config.toml          Configuración local (se genera con "supabase init")
     ├── migrations/          SQL versionado: tablas, vistas, funciones y RLS
+    ├── functions/            Edge Functions con autorización comprobada en servidor
     └── seed.sql             Datos de demostración solo para entorno local
 ```
 

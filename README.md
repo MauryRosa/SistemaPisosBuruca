@@ -24,9 +24,12 @@ React 18 + JavaScript (Vite), CSS propio con variables, React Router, TanStack Q
 ## Cómo ejecutar
 ```bash
 pnpm install
-cp .env.example .env   # completar con la URL y la clave pública de Supabase
+cp .env.example .env   # completar con la URL, la clave pública y el dominio interno
 pnpm dev               # http://localhost:5173
 ```
+
+Para iniciar Supabase local, preparar el entorno alojado y revisar la lista previa a producción, consulta [Puesta en marcha](docs/PUESTA-EN-MARCHA.md).
+La matriz de cobertura funcional y no funcional está en [Cobertura de requisitos](docs/COBERTURA-REQUERIMIENTOS.md).
 
 ## Scripts
 | Comando | Uso |
@@ -37,4 +40,4 @@ pnpm dev               # http://localhost:5173
 | `pnpm test` | Pruebas unitarias (Vitest) |
 
 ## Seguridad
-El archivo `.env` está en `.gitignore`. Solo se usa la clave **pública** de Supabase; la clave `service_role` nunca se sube al repositorio.
+El archivo `.env` está en `.gitignore`. El navegador usa la clave **publicable** de Supabase; la clave `service_role` solo se usa como secreto del entorno de Edge Functions y nunca se sube al repositorio.
