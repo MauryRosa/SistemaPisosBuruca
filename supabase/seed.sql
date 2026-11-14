@@ -60,14 +60,14 @@ insert into public.productos (codigo, nombre, tipo, categoria, medida, unidad, p
   ('NIV-KIT', 'Niveladores de piso', 'accesorio', 'Niveladores', null, 'paquete', null, 'pieza', 15, 2),
   ('MAL-DUCHA', 'Malla para ducha', 'accesorio', 'Mallas', null, 'unidad', null, 'pieza', 10, 2);
 
--- ---------- Existencias iniciales (unidad base: piezas o unidades) ----------
+-- ---------- Saldos demo tras las ventas aprobadas (unidad base) ----------
 insert into public.existencias (producto_id, ubicacion_id, cantidad) values
-  (1, 1, 401), (1, 2, 24), (1, 3, 4),
+  (1, 1, 380), (1, 2, 24), (1, 3, 4),
   (2, 1, 21),  (2, 2, 6),
   (3, 1, 320), (3, 2, 16),
   (4, 1, 60),  (4, 2, 8),
   (5, 1, 240), (5, 2, 40), (5, 3, 8),
-  (6, 1, 45),  (6, 2, 10),
+  (6, 1, 40),  (6, 2, 10),
   (7, 1, 12),  (7, 2, 4),
   (8, 1, 60),
   (9, 1, 9),
