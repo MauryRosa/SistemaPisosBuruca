@@ -41,7 +41,7 @@ La fuente oficial `RequerimientosDeSistema.pdf` fija 41 RF y 17 RNF. `Modelo de 
 | RF-31 | Vista de comprobante de salida preparada para imprimir o guardar como PDF desde el navegador; recupera todas las líneas y consulta productos y ubicaciones por lotes. |
 | RF-32 | Despacho desde minibodega en formulario y RPC, que valida el tipo de ubicación. |
 | RF-33 | Captura de cajas+piezas para pisos y unidad simple para accesorios en formularios de movimientos. |
-| RF-34 | Persistencia en piezas/unidades base y presentación como cajas+piezas en `src/lib/unidades.js`; la interfaz no muestra m². |
+| RF-34 | Persistencia en piezas/unidades base; muestra cajas completas y piezas totales, por ejemplo «10 cajas de 2 + 1 suelta: Cajas 10 · Piezas 21» (`src/lib/unidades.js`). La interfaz no muestra m². |
 | RF-35 | Apertura de caja se registra como documento trazable sin modificar existencias. |
 | RF-36 | Físico, reservado y disponible por ubicación en `ConsultaStock.jsx`; cambios de reservas envían una invalidación privada sin exponer sus filas. |
 | RF-37 | Conteos totales o por categoría; catálogo y stock se cargan por páginas, y todos los conteos pendientes se recuperan para aprobación administrativa como documentos atómicos. El historial conserva los 100 más recientes. |
