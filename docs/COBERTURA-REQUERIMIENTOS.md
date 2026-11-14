@@ -27,7 +27,7 @@ La fuente oficial `RequerimientosDeSistema.pdf` fija 41 RF y 17 RNF. `Modelo de 
 | RF-17 | Salida por recibo exige tipo y número en formulario y RPC. |
 | RF-18 | Índice único conserva cada comprobante de salida incluso después de anularla (`20261114105839_conservar_unicidad_de_comprobantes.sql`). |
 | RF-19 | Envío y confirmación de traslados con serie propia en `Traslados.jsx` y RPC. |
-| RF-20 | Merma pendiente, carta privada obligatoria y aprobación administrativa en `Salidas.jsx`, `Aprobaciones.jsx` y RPC. |
+| RF-20 | Merma pendiente, carta privada obligatoria y aprobación administrativa en `Salidas.jsx`, `Aprobaciones.jsx` y RPC; la cola recupera todos los movimientos pendientes por páginas. |
 | RF-21 | Consumo interno con motivo y salida trazable en `Salidas.jsx`. |
 | RF-22 | Existencias de exhibición en una ubicación separada y no vendible; los traslados permiten esa ubicación. |
 | RF-23 | Devolución a proveedor ligada a la recepción original y al documento del proveedor. |
@@ -44,7 +44,7 @@ La fuente oficial `RequerimientosDeSistema.pdf` fija 41 RF y 17 RNF. `Modelo de 
 | RF-34 | Persistencia en piezas/unidades base y presentación como cajas+piezas en `src/lib/unidades.js`; la interfaz no muestra m². |
 | RF-35 | Apertura de caja se registra como documento trazable sin modificar existencias. |
 | RF-36 | Físico, reservado y disponible por ubicación en `ConsultaStock.jsx`; cambios de reservas envían una invalidación privada sin exponer sus filas. |
-| RF-37 | Conteos totales o por categoría; el catálogo y stock se cargan por páginas para incluir todos los productos activos, y los ajustes se aplican como documentos atómicos con aprobación administrativa en `Conteos.jsx`. |
+| RF-37 | Conteos totales o por categoría; catálogo y stock se cargan por páginas, y todos los conteos pendientes se recuperan para aprobación administrativa como documentos atómicos. El historial conserva los 100 más recientes. |
 | RF-38 | Reporte de salidas por periodo en `Reportes.jsx`. |
 | RF-39 | Kardex, movimientos, mermas y bajo mínimo; exportación CSV compatible con Excel. |
 | RF-40 | Login, rutas protegidas, menú por rol, RLS y cuentas administradas en `AuthProvider.jsx`, `ProtectedRoute.jsx` y `Usuarios.jsx`. |
@@ -70,7 +70,7 @@ La fuente oficial `RequerimientosDeSistema.pdf` fija 41 RF y 17 RNF. `Modelo de 
 | RNF-12 | Pendiente configurar respaldos diarios y guardar evidencia de una restauración mensual. |
 | RNF-13 | Las mutaciones de bitácora están restringidas al rol de aplicación; la retención verificable de cinco años depende de respaldos y política operativa. |
 | RNF-14 | Pendiente revisión real de compañeros en PR. Las autorías no se asignan a personas que no hayan hecho el trabajo. |
-| RNF-15 | Stock, conteos, proveedores, catálogos de reservas e historial de reservas recorren resultados por páginas para evitar límites fijos de filas. Pendiente medir crecimiento y rendimiento con volumen representativo; no hay evidencia para afirmar escalabilidad en producción. |
+| RNF-15 | Stock, conteos, proveedores, catálogos de reservas, historial de reservas y colas de aprobación recorren resultados por páginas para evitar límites fijos de filas. Pendiente medir crecimiento y rendimiento con volumen representativo; no hay evidencia para afirmar escalabilidad en producción. |
 | RNF-16 | CSV implementado; integración con facturación queda fuera del alcance de esta versión. |
 | RNF-17 | Código y dependencias de código abierto; falta elegir proveedor/plan y documentar el costo operativo real. |
 

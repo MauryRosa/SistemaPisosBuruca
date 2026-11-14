@@ -41,12 +41,15 @@ export function useStockConteo(ubicacionId) {
   });
 }
 
-async function consultarConteos() {
-  const conteos = comprobar(await supabase
+function consultaBaseConteos() {
+  return supabase
     .from('conteos')
     .select('id,fecha,alcance,categoria,ubicacion_id,estado,creado_por,documento_ajuste_id,documento_ajuste_negativo_id')
     .order('fecha', { ascending: false })
-    .limit(100));
+    .order('id', { ascending: false });
+}
+
+async function completarConteos(conteos) {
   if (conteos.length === 0) return [];
 
   const usuariosIds = [...new Set(conteos.map((conteo) => conteo.creado_por))];
@@ -81,8 +84,21 @@ async function consultarConteos() {
   }));
 }
 
+async function consultarConteos() {
+  return completarConteos(comprobar(await consultaBaseConteos().limit(100)));
+}
+
+async function consultarConteosPendientes() {
+  const conteos = await consultarTodas(() => consultaBaseConteos().eq('estado', 'pendiente'));
+  return completarConteos(conteos);
+}
+
 export function useConteos() {
   return useQuery({ queryKey: ['conteos'], queryFn: consultarConteos });
+}
+
+export function useConteosPendientes() {
+  return useQuery({ queryKey: ['conteos', 'pendientes'], queryFn: consultarConteosPendientes });
 }
 
 function useAccionConteo(nombreFuncion, alInvalidar) {

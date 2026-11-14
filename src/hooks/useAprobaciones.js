@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '../lib/supabase.js';
+import { consultarTodas } from '../lib/consultarTodas.js';
 
 function comprobar(resultado) {
   if (resultado.error) throw resultado.error;
@@ -7,13 +8,12 @@ function comprobar(resultado) {
 }
 
 async function consultarAprobaciones() {
-  const { data: documentos, error } = await supabase
+  const documentos = await consultarTodas(() => supabase
     .from('documentos')
     .select('id,tipo,serie,anio,correlativo,fecha,motivo,es_contingencia,evidencia_url,doc_venta_tipo,doc_venta_numero,doc_proveedor_numero,creado_por,orden_pedido_id')
     .eq('estado', 'pendiente')
     .order('fecha', { ascending: true })
-    .limit(100);
-  if (error) throw error;
+    .order('id', { ascending: true }));
   if (documentos.length === 0) return [];
 
   const documentoIds = documentos.map((documento) => documento.id);

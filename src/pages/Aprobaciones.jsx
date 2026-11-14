@@ -2,7 +2,7 @@ import { useState } from 'react';
 import EmptyState from '../components/ui/EmptyState.jsx';
 import StatusBadge from '../components/ui/StatusBadge.jsx';
 import { useAprobaciones, useAprobarMovimiento, useRechazarMovimiento } from '../hooks/useAprobaciones.js';
-import { useAprobarConteo, useConteos } from '../hooks/useConteos.js';
+import { useAprobarConteo, useConteosPendientes } from '../hooks/useConteos.js';
 import { formatoStock } from '../lib/unidades.js';
 import '../css/aprobaciones.css';
 
@@ -60,9 +60,9 @@ export default function Aprobaciones() {
   const { data: documentos = [], isLoading, isError, refetch } = useAprobaciones();
   const aprobar = useAprobarMovimiento();
   const rechazar = useRechazarMovimiento();
-  const conteosQuery = useConteos();
+  const conteosQuery = useConteosPendientes();
   const aprobarConteo = useAprobarConteo();
-  const conteosPendientes = (conteosQuery.data || []).filter((conteo) => conteo.estado === 'pendiente');
+  const conteosPendientes = conteosQuery.data || [];
   const [motivos, setMotivos] = useState({});
   const [mensaje, setMensaje] = useState(null);
   const procesando = aprobar.isPending || rechazar.isPending;
