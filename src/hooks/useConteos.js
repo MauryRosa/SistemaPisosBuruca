@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '../lib/supabase.js';
-import { consultarTodas } from '../lib/consultarTodas.js';
+import { consultarPorIds, consultarTodas } from '../lib/consultarTodas.js';
 
 function comprobar(resultado) {
   if (resultado.error) throw resultado.error;
@@ -55,18 +55,25 @@ async function completarConteos(conteos) {
   const usuariosIds = [...new Set(conteos.map((conteo) => conteo.creado_por))];
   const ubicacionIds = [...new Set(conteos.map((conteo) => conteo.ubicacion_id))];
   const conteoIds = conteos.map((conteo) => conteo.id);
-  const [usuariosResultado, ubicacionesResultado, detallesResultado] = await Promise.all([
-    supabase.from('v_usuarios_nombres_operativos').select('id,nombre').in('id', usuariosIds),
-    supabase.from('ubicaciones').select('id,nombre').in('id', ubicacionIds),
-    supabase.from('detalle_conteo').select('id,conteo_id,producto_id,cantidad_sistema,cantidad_contada,diferencia').in('conteo_id', conteoIds).order('id'),
+  const [usuarios, ubicaciones, detalles] = await Promise.all([
+    consultarPorIds(usuariosIds, (ids) => supabase.from('v_usuarios_nombres_operativos')
+      .select('id,nombre')
+      .in('id', ids)
+      .order('id')),
+    consultarPorIds(ubicacionIds, (ids) => supabase.from('ubicaciones')
+      .select('id,nombre')
+      .in('id', ids)
+      .order('id')),
+    consultarPorIds(conteoIds, (ids) => supabase.from('detalle_conteo')
+      .select('id,conteo_id,producto_id,cantidad_sistema,cantidad_contada,diferencia')
+      .in('conteo_id', ids)
+      .order('id')),
   ]);
-  const usuarios = comprobar(usuariosResultado);
-  const ubicaciones = comprobar(ubicacionesResultado);
-  const detalles = comprobar(detallesResultado);
   const productoIds = [...new Set(detalles.map((detalle) => detalle.producto_id))];
-  const productos = productoIds.length
-    ? comprobar(await supabase.from('productos').select('id,codigo,nombre,tipo,unidad,piezas_por_caja').in('id', productoIds))
-    : [];
+  const productos = await consultarPorIds(productoIds, (ids) => supabase.from('productos')
+    .select('id,codigo,nombre,tipo,unidad,piezas_por_caja')
+    .in('id', ids)
+    .order('id'));
   const porUsuario = new Map(usuarios.map((usuario) => [usuario.id, usuario.nombre]));
   const porUbicacion = new Map(ubicaciones.map((ubicacion) => [ubicacion.id, ubicacion.nombre]));
   const porProducto = new Map(productos.map((producto) => [producto.id, producto]));
