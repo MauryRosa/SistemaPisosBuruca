@@ -1,0 +1,186 @@
+.reservas {
+  display: grid;
+  gap: var(--sp-5);
+}
+
+.reservas__formulario {
+  display: grid;
+  gap: var(--sp-4);
+  padding: var(--sp-5);
+}
+
+.reservas__formulario h2,
+.reservas__historial-cabecera h2 {
+  margin: 0;
+}
+
+.reservas__formulario > div:first-child p,
+.reservas__historial-cabecera p {
+  margin-top: var(--sp-1);
+  color: var(--text-muted);
+  font-size: var(--fs-label);
+}
+
+.reservas__campos {
+  display: grid;
+  gap: var(--sp-3);
+}
+
+.reservas__cantidad {
+  display: grid;
+  align-items: end;
+  gap: var(--sp-3);
+}
+
+.reservas__saldo {
+  align-self: center;
+  margin: 0;
+  color: var(--text-muted);
+  font-size: var(--fs-label);
+}
+
+.reservas__saldo--error {
+  color: var(--danger-text);
+}
+
+.reservas__acciones,
+.reservas__tarjeta-acciones {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--sp-2);
+}
+
+.reservas .btn {
+  min-height: 48px;
+}
+
+.reservas__historial {
+  display: grid;
+  gap: var(--sp-3);
+}
+
+.reservas__historial-cabecera {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3);
+}
+
+.reservas__pestanas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+}
+
+.reservas__tarjeta {
+  display: grid;
+  gap: var(--sp-3);
+  padding: var(--sp-5);
+}
+
+.reservas__tarjeta header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  padding-bottom: var(--sp-3);
+  border-bottom: 1px solid var(--border);
+}
+
+.reservas__tarjeta header h3 {
+  margin: 0;
+}
+
+.reservas__tarjeta header p {
+  margin-top: var(--sp-1);
+  color: var(--text-muted);
+  font-size: var(--fs-label);
+}
+
+.reservas__tarjeta dl {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 190px), 1fr));
+  gap: var(--sp-3);
+  margin: 0;
+}
+
+.reservas__tarjeta dl > div {
+  display: grid;
+  gap: var(--sp-1);
+}
+
+.reservas__tarjeta dt {
+  color: var(--text-muted);
+  font-size: var(--fs-label);
+}
+
+.reservas__tarjeta dd {
+  margin: 0;
+}
+
+.reservas__tarjeta .reservas__motivo {
+  grid-column: 1 / -1;
+}
+
+.reservas__cancelar {
+  display: grid;
+  gap: var(--sp-2);
+  padding-top: var(--sp-3);
+  border-top: 1px solid var(--border);
+}
+
+.reservas__mensaje {
+  margin: 0;
+  padding: var(--sp-3) var(--sp-4);
+  border-radius: var(--radius);
+  font-size: var(--fs-label);
+}
+
+.reservas__mensaje--exito {
+  background: var(--success-bg);
+  color: var(--success-text);
+}
+
+.reservas__mensaje--error {
+  background: var(--danger-bg);
+  color: var(--danger-text);
+}
+
+@media (min-width: 768px) {
+  .reservas__campos {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .reservas__cantidad {
+    grid-template-columns: repeat(2, minmax(120px, .6fr)) minmax(220px, 1.8fr);
+  }
+
+  .reservas__cancelar {
+    grid-template-columns: minmax(200px, 1fr) auto auto;
+    align-items: end;
+  }
+}
+
+@media (max-width: 767px) {
+  .reservas__cantidad {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .reservas__saldo {
+    grid-column: 1 / -1;
+  }
+
+  .reservas__acciones,
+  .reservas__acciones .btn,
+  .reservas__tarjeta-acciones,
+  .reservas__tarjeta-acciones .btn,
+  .reservas__cancelar .btn {
+    width: 100%;
+  }
+
+  .reservas__cancelar .btn + .btn {
+    margin-top: 0;
+  }
+}
