@@ -82,7 +82,7 @@ La fuente oficial `RequerimientosDeSistema.pdf` fija 41 RF y 17 RNF. `Modelo de 
 - No se ejecutó la suite automatizada ni una base PostgreSQL: `supabase status` no pudo inspeccionar Podman porque no puede ajustar `/run/user/1000/libpod` (`read-only file system`).
 - La lista de proyectos Supabase consultada el 14/11/2026 mostró `SIA-U` y `UNIVO-Sistema-Contable`, sin proyecto Pisos Buruca. La primera consulta falló y el reintento recuperó la lista. No se aplicaron migraciones ni se desplegó Edge Function.
 - La rama integrada sigue local y no se publicó en GitHub.
-- `variablesDB.txt` no está presente ni versionado; los archivos `.env` están ignorados. No se leyó su contenido.
+- `variablesDB.txt` está en el directorio padre del repositorio, con permisos `0600`, y no forma parte de Git; no se leyó su contenido. Los archivos `.env` están ignorados.
 
 ## Criterio de cierre
 
