@@ -30,7 +30,7 @@ La fuente oficial `RequerimientosDeSistema.pdf` fija 41 RF y 17 RNF. `Modelo de 
 | RF-20 | Merma pendiente, carta privada obligatoria y aprobación administrativa en `Salidas.jsx`, `Aprobaciones.jsx` y RPC; la cola recupera todos los movimientos pendientes por páginas. |
 | RF-21 | Consumo interno con motivo y salida trazable en `Salidas.jsx`. |
 | RF-22 | Existencias de exhibición en una ubicación separada y no vendible; los traslados permiten esa ubicación. |
-| RF-23 | Devolución a proveedor ligada a la recepción original y al documento del proveedor. |
+| RF-23 | Devolución a proveedor ligada a la recepción original y al documento del proveedor; la base valida producto, ubicación y cantidad acumulada frente a la recepción (`20261114140137_validar_devolucion_proveedor.sql`). |
 | RF-24 | Cambio captura devolución y reemplazo dentro de una sola llamada transaccional. |
 | RF-25 | Anulación con motivo y movimiento inverso; se pueden localizar todos los documentos anulables y los casos no reversibles se bloquean en `20261114105810_anulaciones_y_apertura_caja.sql`. |
 | RF-26 | Jefatura de bodega crea reservas para una vendedora en `Reservas.jsx`; el historial y los catálogos asociados recuperan todos los registros por páginas. |
