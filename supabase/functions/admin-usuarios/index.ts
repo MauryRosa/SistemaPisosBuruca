@@ -93,7 +93,16 @@ Deno.serve(async (solicitud) => {
     activo: true,
   });
   if (errorInsertarPerfil) {
-    await administrador.auth.admin.deleteUser(usuarioAuth.user.id);
+    let cuentaLimpia = false;
+    try {
+      const { error: errorLimpieza } = await administrador.auth.admin.deleteUser(usuarioAuth.user.id);
+      cuentaLimpia = !errorLimpieza;
+    } catch {
+      cuentaLimpia = false;
+    }
+    if (!cuentaLimpia) {
+      return responder(500, { error: 'No se pudo crear el perfil y la cuenta de acceso quedó pendiente de limpieza. Revisa Authentication antes de volver a intentarlo.' });
+    }
     if (errorInsertarPerfil.code === '23505') return responder(409, { error: 'Ese nombre de usuario ya existe.' });
     return responder(500, { error: 'No se pudo crear el perfil. La cuenta incompleta se limpió.' });
   }
