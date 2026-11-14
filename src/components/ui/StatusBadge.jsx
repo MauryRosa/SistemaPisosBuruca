@@ -12,6 +12,10 @@ const ESTADOS = {
   activa: { texto: 'Activa', icono: 'check' },
   consumida: { texto: 'Consumida', icono: 'check' },
   cancelada: { texto: 'Cancelada', icono: 'x' },
+  abierta: { texto: 'Abierta', icono: 'reloj' },
+  parcial: { texto: 'Parcial', icono: 'alerta' },
+  cerrada: { texto: 'Cerrada', icono: 'check' },
+  anulada: { texto: 'Anulada', icono: 'x' },
 };
 
 export default function StatusBadge({ estado, texto }) {
