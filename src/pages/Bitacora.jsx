@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import EmptyState from '../components/ui/EmptyState.jsx';
 import StatusBadge from '../components/ui/StatusBadge.jsx';
 import { useAnularMovimiento, useBitacora, useDocumentosAnulables, useUsuariosBitacora } from '../hooks/useBitacora.js';
+import { valorCSV } from '../lib/csv.js';
 import '../css/bitacora.css';
 
 const TABLAS = [
@@ -39,12 +40,6 @@ const NOMBRES_TIPO = {
 
 function serializar(valor) {
   return valor ? JSON.stringify(valor, null, 2) : 'Sin valor';
-}
-
-function valorCSV(valor) {
-  const texto = String(valor ?? '');
-  const seguro = /^[=+\-@\t\r]/.test(texto) ? `'${texto}` : texto;
-  return `"${seguro.replaceAll('"', '""')}"`;
 }
 
 function exportarBitacora(filas) {
