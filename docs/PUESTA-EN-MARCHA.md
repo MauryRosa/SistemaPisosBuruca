@@ -18,7 +18,14 @@ El archivo `supabase/config.toml` configura el entorno local; no aplica por sí 
 2. Despliega `admin-usuarios` y configura `AUTH_DOMAIN` como secreto de la función. Usa el mismo dominio como `VITE_AUTH_DOMAIN` durante la compilación del frontend.
 3. Configura Auth para desactivar el registro público, exigir contraseñas de al menos 12 caracteres y usar JWT de 1 hora. En el repositorio, `supabase/config.toml` fija además una sesión máxima de 24 horas y cierre tras 8 horas de inactividad; el navegador cierra a los 30 minutos. Supabase reserva los límites server-side de sesión para plan Pro. Confirma el plan alojado y aplica esos límites en Auth; si el proyecto no los admite, RNF-10 sigue pendiente.
 4. Sirve la aplicación con HTTPS y configura `VITE_SUPABASE_URL` y `VITE_SUPABASE_PUBLISHABLE_KEY` en el entorno de compilación. La clave publicable puede estar en el navegador; la clave `service_role` no.
-5. Crea cuentas reales y valida cada rol. No cargues las cuentas de demostración del seed en el proyecto alojado.
+5. Para iniciar el proyecto, crea la primera cuenta desde Authentication en el dashboard con el correo `<usuario>@AUTH_DOMAIN` y registra su perfil como administrador desde SQL Editor, usando el UUID que generó Supabase:
+
+   ```sql
+   insert into public.usuarios (id, nombre, usuario, rol, activo)
+   values ('<UUID-DE-AUTH>', '<NOMBRE>', '<USUARIO>', 'administrador', true);
+   ```
+
+   Haz este paso una sola vez en el proyecto correcto y no guardes el UUID real ni credenciales en Git. Después, crea las demás cuentas desde Usuarios. No cargues las cuentas de demostración del seed en el proyecto alojado.
 6. Configura respaldos diarios y conserva evidencia de una restauración mensual.
 
 Referencias: [Auth sessions](https://supabase.com/docs/guides/auth/sessions), [despliegue de Edge Functions](https://supabase.com/docs/guides/functions/deploy), [gestión de secretos](https://supabase.com/docs/guides/functions/secrets) y [respaldos](https://supabase.com/docs/guides/platform/backups).
