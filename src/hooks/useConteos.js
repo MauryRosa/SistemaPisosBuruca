@@ -41,10 +41,10 @@ export function useStockConteo(ubicacionId) {
   });
 }
 
-function consultaBaseConteos() {
+function consultaBaseConteos(opciones) {
   return supabase
     .from('conteos')
-    .select('id,fecha,alcance,categoria,ubicacion_id,estado,creado_por,documento_ajuste_id,documento_ajuste_negativo_id')
+    .select('id,fecha,alcance,categoria,ubicacion_id,estado,creado_por,documento_ajuste_id,documento_ajuste_negativo_id', opciones)
     .order('fecha', { ascending: false })
     .order('id', { ascending: false });
 }
@@ -95,17 +95,28 @@ async function consultarConteos() {
   return completarConteos(comprobar(await consultaBaseConteos().limit(100)));
 }
 
-async function consultarConteosPendientes() {
-  const conteos = await consultarTodas(() => consultaBaseConteos().eq('estado', 'pendiente'));
-  return completarConteos(conteos);
+async function consultarConteosPendientes(pagina, tamanoPagina) {
+  const desde = pagina * tamanoPagina;
+  const hasta = desde + tamanoPagina - 1;
+  const { data, error, count } = await consultaBaseConteos({ count: 'exact' })
+    .eq('estado', 'pendiente')
+    .range(desde, hasta);
+  if (error) throw error;
+  return {
+    items: await completarConteos(data || []),
+    total: count || 0,
+  };
 }
 
 export function useConteos() {
   return useQuery({ queryKey: ['conteos'], queryFn: consultarConteos });
 }
 
-export function useConteosPendientes() {
-  return useQuery({ queryKey: ['conteos', 'pendientes'], queryFn: consultarConteosPendientes });
+export function useConteosPendientes(pagina = 0, tamanoPagina = 15) {
+  return useQuery({
+    queryKey: ['conteos', 'pendientes', pagina, tamanoPagina],
+    queryFn: () => consultarConteosPendientes(pagina, tamanoPagina),
+  });
 }
 
 function useAccionConteo(nombreFuncion, alInvalidar) {

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import EmptyState from '../components/ui/EmptyState.jsx';
 import StatusBadge from '../components/ui/StatusBadge.jsx';
 import { useAprobaciones, useAprobarMovimiento, useRechazarMovimiento } from '../hooks/useAprobaciones.js';
@@ -22,6 +22,7 @@ const TIPOS = {
   ajuste_negativo: 'Ajuste negativo',
 };
 const TAMANO_PAGINA_APROBACIONES = 15;
+const TAMANO_PAGINA_CONTEOS = 5;
 
 function fechaHora(valor) {
   return new Date(valor).toLocaleString('es-SV', {
@@ -58,29 +59,34 @@ function diferenciaConteo(detalle) {
 }
 
 export default function Aprobaciones() {
-  const { data: documentos = [], isLoading, isError, refetch } = useAprobaciones();
-  const aprobar = useAprobarMovimiento();
-  const rechazar = useRechazarMovimiento();
-  const conteosQuery = useConteosPendientes();
-  const aprobarConteo = useAprobarConteo();
-  const conteosPendientes = conteosQuery.data || [];
-  const [motivos, setMotivos] = useState({});
-  const [mensaje, setMensaje] = useState(null);
   const [paginaMovimientos, setPaginaMovimientos] = useState(0);
   const [paginaConteos, setPaginaConteos] = useState(0);
+  const { data: aprobaciones, isLoading, isError, refetch } = useAprobaciones(paginaMovimientos, TAMANO_PAGINA_APROBACIONES);
+  const aprobar = useAprobarMovimiento();
+  const rechazar = useRechazarMovimiento();
+  const conteosQuery = useConteosPendientes(paginaConteos, TAMANO_PAGINA_CONTEOS);
+  const aprobarConteo = useAprobarConteo();
+  const documentos = aprobaciones?.items || [];
+  const totalDocumentos = aprobaciones?.total || 0;
+  const conteosPendientes = conteosQuery.data?.items || [];
+  const totalConteos = conteosQuery.data?.total || 0;
+  const [motivos, setMotivos] = useState({});
+  const [mensaje, setMensaje] = useState(null);
   const procesando = aprobar.isPending || rechazar.isPending;
-  const paginasMovimientos = Math.ceil(documentos.length / TAMANO_PAGINA_APROBACIONES);
-  const paginaMovimientosActual = Math.min(paginaMovimientos, Math.max(0, paginasMovimientos - 1));
-  const documentosVisibles = documentos.slice(
-    paginaMovimientosActual * TAMANO_PAGINA_APROBACIONES,
-    (paginaMovimientosActual + 1) * TAMANO_PAGINA_APROBACIONES,
-  );
-  const paginasConteos = Math.ceil(conteosPendientes.length / TAMANO_PAGINA_APROBACIONES);
-  const paginaConteosActual = Math.min(paginaConteos, Math.max(0, paginasConteos - 1));
-  const conteosVisibles = conteosPendientes.slice(
-    paginaConteosActual * TAMANO_PAGINA_APROBACIONES,
-    (paginaConteosActual + 1) * TAMANO_PAGINA_APROBACIONES,
-  );
+  const paginasMovimientos = Math.ceil(totalDocumentos / TAMANO_PAGINA_APROBACIONES);
+  const paginasConteos = Math.ceil(totalConteos / TAMANO_PAGINA_CONTEOS);
+
+  useEffect(() => {
+    if (isLoading || isError) return;
+    const ultimaPagina = Math.max(0, paginasMovimientos - 1);
+    if (paginaMovimientos > ultimaPagina) setPaginaMovimientos(ultimaPagina);
+  }, [isError, isLoading, paginaMovimientos, paginasMovimientos]);
+
+  useEffect(() => {
+    if (conteosQuery.isLoading || conteosQuery.isError) return;
+    const ultimaPagina = Math.max(0, paginasConteos - 1);
+    if (paginaConteos > ultimaPagina) setPaginaConteos(ultimaPagina);
+  }, [conteosQuery.isError, conteosQuery.isLoading, paginaConteos, paginasConteos]);
 
   async function aprobarDocumento(documento) {
     setMensaje(null);
@@ -114,8 +120,8 @@ export default function Aprobaciones() {
           <p>Las mermas y los ajustes pendientes no cambian las existencias hasta resolverse.</p>
         </div>
         <div className="aprobaciones__contadores">
-          <StatusBadge estado="pendiente" texto={`${documentos.length} movimiento${documentos.length === 1 ? '' : 's'}`} />
-          <StatusBadge estado="pendiente" texto={`${conteosPendientes.length} conteo${conteosPendientes.length === 1 ? '' : 's'}`} />
+          <StatusBadge estado="pendiente" texto={`${totalDocumentos} movimiento${totalDocumentos === 1 ? '' : 's'}`} />
+          <StatusBadge estado="pendiente" texto={`${totalConteos} conteo${totalConteos === 1 ? '' : 's'}`} />
         </div>
       </header>
 
@@ -133,7 +139,7 @@ export default function Aprobaciones() {
           </button>
         </EmptyState>
       )}
-      {!isLoading && !isError && documentos.length === 0 && (
+      {!isLoading && !isError && totalDocumentos === 0 && (
         <div className="card">
           <EmptyState icon="aprobar" title="No hay movimientos por revisar." />
         </div>
@@ -142,7 +148,7 @@ export default function Aprobaciones() {
       {!isLoading && !isError && documentos.length > 0 && (
         <>
           <div className="aprobaciones__lista">
-          {documentosVisibles.map((documento) => {
+          {documentos.map((documento) => {
             const enlace = urlSegura(documento.evidencia_enlace);
             return (
               <article className="card aprobaciones__tarjeta" key={documento.id}>
@@ -249,11 +255,11 @@ export default function Aprobaciones() {
           </div>
           {paginasMovimientos > 1 && (
             <nav className="aprobaciones__paginacion" aria-label="Paginación de movimientos pendientes">
-              <button className="btn btn--secondary" type="button" onClick={() => setPaginaMovimientos(paginaMovimientosActual - 1)} disabled={paginaMovimientosActual === 0}>
+              <button className="btn btn--secondary" type="button" onClick={() => setPaginaMovimientos((pagina) => pagina - 1)} disabled={paginaMovimientos === 0}>
                 Anterior
               </button>
-              <span>Página {paginaMovimientosActual + 1} de {paginasMovimientos}</span>
-              <button className="btn btn--secondary" type="button" onClick={() => setPaginaMovimientos(paginaMovimientosActual + 1)} disabled={paginaMovimientosActual + 1 >= paginasMovimientos}>
+              <span>Página {paginaMovimientos + 1} de {paginasMovimientos}</span>
+              <button className="btn btn--secondary" type="button" onClick={() => setPaginaMovimientos((pagina) => pagina + 1)} disabled={paginaMovimientos + 1 >= paginasMovimientos}>
                 Siguiente
               </button>
             </nav>
@@ -267,7 +273,7 @@ export default function Aprobaciones() {
             <h2 id="aprobaciones-conteos-titulo">Conteos físicos</h2>
             <p>Las diferencias se aplican mediante documentos de ajuste auditados.</p>
           </div>
-          <StatusBadge estado="pendiente" texto={`${conteosPendientes.length} pendiente${conteosPendientes.length === 1 ? '' : 's'}`} />
+          <StatusBadge estado="pendiente" texto={`${totalConteos} pendiente${totalConteos === 1 ? '' : 's'}`} />
         </header>
         {conteosQuery.isLoading && <EmptyState loading title="Consultando conteos pendientes…" />}
         {conteosQuery.isError && (
@@ -275,13 +281,13 @@ export default function Aprobaciones() {
             <button type="button" className="btn btn--secondary" onClick={() => conteosQuery.refetch()}>Reintentar</button>
           </EmptyState>
         )}
-        {!conteosQuery.isLoading && !conteosQuery.isError && conteosPendientes.length === 0 && (
+        {!conteosQuery.isLoading && !conteosQuery.isError && totalConteos === 0 && (
           <div className="card"><EmptyState title="No hay conteos físicos por aprobar." /></div>
         )}
         {!conteosQuery.isLoading && !conteosQuery.isError && conteosPendientes.length > 0 && (
           <>
             <div className="aprobaciones__lista">
-            {conteosVisibles.map((conteo) => {
+            {conteosPendientes.map((conteo) => {
               const diferencias = conteo.detalles.filter((detalle) => detalle.diferencia !== 0);
               return (
                 <article className="card aprobaciones__tarjeta" key={conteo.id}>
@@ -337,11 +343,11 @@ export default function Aprobaciones() {
             </div>
             {paginasConteos > 1 && (
               <nav className="aprobaciones__paginacion" aria-label="Paginación de conteos pendientes">
-                <button className="btn btn--secondary" type="button" onClick={() => setPaginaConteos(paginaConteosActual - 1)} disabled={paginaConteosActual === 0}>
+                <button className="btn btn--secondary" type="button" onClick={() => setPaginaConteos((pagina) => pagina - 1)} disabled={paginaConteos === 0}>
                   Anterior
                 </button>
-                <span>Página {paginaConteosActual + 1} de {paginasConteos}</span>
-                <button className="btn btn--secondary" type="button" onClick={() => setPaginaConteos(paginaConteosActual + 1)} disabled={paginaConteosActual + 1 >= paginasConteos}>
+                <span>Página {paginaConteos + 1} de {paginasConteos}</span>
+                <button className="btn btn--secondary" type="button" onClick={() => setPaginaConteos((pagina) => pagina + 1)} disabled={paginaConteos + 1 >= paginasConteos}>
                   Siguiente
                 </button>
               </nav>
