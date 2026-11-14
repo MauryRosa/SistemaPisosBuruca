@@ -2,6 +2,8 @@
 
 Contraste de la matriz `Vault_Pisos_Buruca/03 Requerimientos` con el código de esta rama. La columna de cobertura indica dónde está implementada cada regla; no sustituye las pruebas de aceptación descritas después.
 
+La fuente oficial `RequerimientosDeSistema.pdf` fija 41 RF y 17 RNF. `Modelo de datos.md` menciona RF-42 para contingencias en papel, pero ese código no aparece en la lista funcional y `Reglas de negocio.md` lo marca como una regla sin RF. La aplicación permite marcar la digitalización de una contingencia; el plazo operativo de mismo día no forma parte de los 41 RF/RNF evaluados aquí.
+
 ## Requisitos funcionales
 
 | Requisito | Implementación local |
