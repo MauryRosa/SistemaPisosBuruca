@@ -79,10 +79,10 @@ insert into public.correlativos (serie, anio, ultimo_numero) values
   ('MER', extract(year from now())::int, 1);
 
 -- Flujo real: el documento nace pendiente, se agregan sus líneas y luego se aprueba
-insert into public.documentos (tipo, serie, anio, correlativo, doc_venta_tipo, doc_venta_numero, estado, creado_por, retira_nombre)
+insert into public.documentos (tipo, serie, anio, correlativo, doc_venta_tipo, doc_venta_numero, estado, creado_por, retira_nombre, placa)
 values
-  ('salida_venta', 'VTA', extract(year from now())::int, 1, 'factura', 'F-1001', 'pendiente', '22222222-2222-2222-2222-222222222222', 'Cliente demo'),
-  ('salida_venta', 'VTA', extract(year from now())::int, 2, 'recibo', 'R-2045', 'pendiente', '22222222-2222-2222-2222-222222222222', 'Transportista demo');
+  ('salida_venta', 'VTA', extract(year from now())::int, 1, 'factura', 'F-1001', 'pendiente', '22222222-2222-2222-2222-222222222222', 'Cliente demo', 'P123-456'),
+  ('salida_venta', 'VTA', extract(year from now())::int, 2, 'recibo', 'R-2045', 'pendiente', '22222222-2222-2222-2222-222222222222', 'Transportista demo', 'P789-012');
 insert into public.documentos (tipo, serie, anio, correlativo, estado, motivo, creado_por)
 values ('merma', 'MER', extract(year from now())::int, 1, 'pendiente', 'Caja quebrada al descargar', '22222222-2222-2222-2222-222222222222');
 
