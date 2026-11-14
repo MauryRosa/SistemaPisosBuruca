@@ -1,0 +1,125 @@
+.usuarios {
+  display: grid;
+  gap: var(--sp-4);
+}
+
+.usuarios__formulario {
+  display: grid;
+  gap: var(--sp-4);
+  padding: var(--sp-5);
+}
+
+.usuarios__formulario h2,
+.usuarios__lista h2 {
+  margin: 0;
+}
+
+.usuarios__formulario > div:first-child p,
+.usuarios__lista > header p {
+  margin-top: var(--sp-1);
+  color: var(--text-muted);
+  font-size: var(--fs-label);
+}
+
+.usuarios__campos {
+  display: grid;
+  gap: var(--sp-3);
+}
+
+.usuarios__ayuda {
+  margin-top: var(--sp-1);
+  color: var(--text-muted);
+  font-size: var(--fs-label);
+}
+
+.usuarios__acciones {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.usuarios .btn {
+  min-height: 48px;
+}
+
+.usuarios__lista {
+  display: grid;
+  gap: var(--sp-3);
+}
+
+.usuarios__lista > header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3);
+}
+
+.usuarios__tarjetas {
+  display: grid;
+  gap: var(--sp-3);
+}
+
+.usuarios__tarjeta {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: var(--sp-4);
+}
+
+.usuarios__tarjeta h3 {
+  margin: 0;
+}
+
+.usuarios__tarjeta p {
+  margin-top: var(--sp-1);
+  color: var(--text-muted);
+}
+
+.usuarios__tarjeta small {
+  color: var(--text-muted);
+  font-size: var(--fs-label);
+}
+
+.usuarios__tarjeta .badge {
+  justify-self: end;
+}
+
+.usuarios__tarjeta .btn {
+  grid-column: 1 / -1;
+}
+
+.usuarios__mensaje {
+  margin: 0;
+  padding: var(--sp-3) var(--sp-4);
+  border-radius: var(--radius);
+  font-size: var(--fs-label);
+}
+
+.usuarios__mensaje--exito {
+  background: var(--success-bg);
+  color: var(--success-text);
+}
+
+.usuarios__mensaje--error {
+  background: var(--danger-bg);
+  color: var(--danger-text);
+}
+
+@media (min-width: 768px) {
+  .usuarios__campos {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .usuarios__tarjetas {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .usuarios__tarjeta {
+    grid-template-columns: minmax(0, 1fr) auto auto;
+  }
+
+  .usuarios__tarjeta .btn {
+    grid-column: auto;
+  }
+}
