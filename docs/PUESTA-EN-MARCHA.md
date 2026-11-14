@@ -41,3 +41,10 @@ Referencias: [Auth sessions](https://supabase.com/docs/guides/auth/sessions), [d
 - [ ] Obtener revisión real de otro integrante en GitHub antes de cerrar los PR.
 
 `npm run lint` y `npm run build` pasan en la rama actual. Las casillas anteriores aún requieren una instancia Supabase accesible, un despliegue y revisión del equipo.
+
+## Estado de Supabase consultado el 14/11/2026
+
+- La organización `Gnd Code` está en el plan Free y tiene dos proyectos activos (`SIA-U` y `UNIVO-Sistema-Contable`); no hay un proyecto de Pisos Buruca.
+- La cotización de creación para el proyecto devolvió USD 0/mes, pero la organización ya alcanzó el límite de dos proyectos activos del plan Free. La cotización no confirma que se pueda crear un tercero con el plan actual.
+- Pro cuesta USD 25/mes e incluye créditos para una instancia Micro y respaldos diarios de base de datos con siete días de retención. Los respaldos de base de datos no incluyen objetos de Storage; la evidencia de movimientos requiere un respaldo separado. Confirma el costo final de la organización antes de cambiar el plan o crear el proyecto.
+- Fuentes: [precios de Supabase](https://supabase.com/pricing), [respaldos de base de datos](https://supabase.com/docs/guides/platform/backups).
