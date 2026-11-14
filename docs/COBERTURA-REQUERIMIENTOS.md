@@ -37,7 +37,7 @@ La fuente oficial `RequerimientosDeSistema.pdf` fija 41 RF y 17 RNF. `Modelo de 
 | RF-27 | La vista de stock calcula disponible como físico menos reservas activas; `v_reservas_stock_activas` entrega solo totales a perfiles activos y mantiene privadas las filas de reservas. |
 | RF-28 | Despacho consume la reserva coincidente; cancelación requiere motivo. |
 | RF-29 | Correlativos de servidor por serie/año, iniciados en 00001, mediante `correlativos`. |
-| RF-30 | Nombre de quien retira, placa obligatoria (`Salidas.jsx` y `20261114105837_requerir_placa_en_despachos.sql`) y firma/foto privada; el comprobante se puede imprimir. |
+| RF-30 | Nombre de quien retira obligatorio; placa opcional cuando no hay vehículo (`Salidas.jsx` y `20261114131257_allow_dispatch_without_vehicle_plate.sql`); firma/foto privada y comprobante imprimible. |
 | RF-31 | Vista de comprobante de salida preparada para imprimir o guardar como PDF desde el navegador. |
 | RF-32 | Despacho desde minibodega en formulario y RPC, que valida el tipo de ubicación. |
 | RF-33 | Captura de cajas+piezas para pisos y unidad simple para accesorios en formularios de movimientos. |
