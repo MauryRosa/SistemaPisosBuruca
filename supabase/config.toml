@@ -221,8 +221,10 @@ web3 = 30
 # secret = ""
 
 [auth.email]
-# Allow/disallow new user signups via email to your project.
-enable_signup = false
+# OJO: en el CLI de Supabase esta opción activa el PROVEEDOR de correo (inicio de sesión con
+# usuario y contraseña). Con false nadie puede ingresar, ni las cuentas administradas.
+# Los registros nuevos siguen bloqueados por [auth] enable_signup = false (signup_disabled).
+enable_signup = true
 # If enabled, a user will be required to confirm any email change on both the old, and new email
 # addresses. If disabled, only the new email is required to confirm.
 double_confirm_changes = true
