@@ -34,10 +34,10 @@ begin
     raise exception 'Solo administracion o ventas puede crear pedidos.';
   end if;
 
-  if not exists (
-    select 1 from public.proveedores p
-    where p.id = p_proveedor_id and p.activo
-  ) then
+  perform 1 from public.proveedores p
+  where p.id = p_proveedor_id and p.activo
+  for share;
+  if not found then
     raise exception 'Seleccione un proveedor activo.';
   end if;
 
@@ -51,7 +51,9 @@ begin
     raise exception 'Agregue cada producto una sola vez al pedido.';
   end if;
 
-  for v_linea in select value from jsonb_array_elements(p_detalles)
+  for v_linea in
+    select value from jsonb_array_elements(p_detalles)
+    order by (value ->> 'producto_id')::bigint
   loop
     v_producto_id := nullif(v_linea ->> 'producto_id', '')::bigint;
     v_cantidad := nullif(v_linea ->> 'cantidad', '')::integer;
@@ -60,11 +62,11 @@ begin
       raise exception 'Cada linea requiere producto y cantidad positiva.';
     end if;
 
-    if not exists (
-      select 1 from public.productos p
-      where p.id = v_producto_id and p.activo
-        and (p.proveedor_id is null or p.proveedor_id = p_proveedor_id)
-    ) then
+    perform 1 from public.productos p
+    where p.id = v_producto_id and p.activo
+      and (p.proveedor_id is null or p.proveedor_id = p_proveedor_id)
+    for share;
+    if not found then
       raise exception 'El producto % no esta activo o no pertenece al proveedor.', v_producto_id;
     end if;
   end loop;
