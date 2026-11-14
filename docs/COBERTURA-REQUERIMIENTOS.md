@@ -76,6 +76,7 @@ La fuente oficial `RequerimientosDeSistema.pdf` fija 41 RF y 17 RNF. `Modelo de 
 
 ## Verificación realizada
 
+- Comparación estática de trazabilidad: la matriz incluye los 41 RF del PDF oficial y los 17 RNF de la bóveda, sin códigos omitidos; las 15 rutas del menú tienen una pantalla asignada. Esta comprobación confirma referencias, no la ejecución funcional de cada flujo.
 - `npm run lint`: correcto.
 - `npm run build`: correcto; Vite transformó 223 módulos.
 - `git diff --check`: correcto.
