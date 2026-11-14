@@ -97,7 +97,7 @@
   display: flex;
   align-items: center;
   gap: var(--sp-3);
-  min-height: 44px;
+  min-height: var(--touch);
   padding: 0 var(--sp-3);
   border-radius: var(--radius);
   color: #ece9e2;
@@ -154,8 +154,8 @@
 }
 
 .topbar__menu {
-  width: 44px;
-  height: 44px;
+  width: var(--touch);
+  height: var(--touch);
   display: grid;
   place-items: center;
   border-radius: var(--radius);

@@ -45,7 +45,7 @@
 }
 
 .btn--ghost {
-  min-height: 40px;
+  min-height: var(--touch);
   padding: 0 var(--sp-3);
   color: var(--text-muted);
 }
@@ -123,9 +123,9 @@
 
 .input-group__action {
   position: absolute;
-  right: 4px;
-  width: 44px;
-  height: 40px;
+  right: 2px;
+  width: var(--touch);
+  height: var(--touch);
   display: grid;
   place-items: center;
   color: var(--icon-muted);
