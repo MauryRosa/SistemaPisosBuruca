@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '../lib/supabase.js';
+import { consultarTodas } from '../lib/consultarTodas.js';
 
 function comprobar(resultado) {
   if (resultado.error) throw resultado.error;
@@ -46,12 +47,12 @@ export function useDocumentosAnulables() {
   return useQuery({
     queryKey: ['documentos-anulables'],
     queryFn: async () => {
-      const documentos = comprobar(await supabase.from('documentos')
+      const documentos = await consultarTodas(() => supabase.from('documentos')
         .select('id,serie,anio,correlativo,tipo,fecha,motivo,retira_nombre,doc_venta_tipo,doc_venta_numero,traslado_confirmado_en')
         .eq('estado', 'aprobado')
         .not('tipo', 'in', '(anulacion,apertura_caja)')
         .order('fecha', { ascending: false })
-        .limit(100));
+        .order('id', { ascending: false }));
       return documentos.map((documento) => ({
         ...documento,
         numero: `${documento.serie}-${documento.anio}-${String(documento.correlativo).padStart(5, '0')}`,

@@ -84,6 +84,26 @@
   gap: var(--sp-3);
 }
 
+.bitacora__busqueda-anulables {
+  max-width: 720px;
+}
+
+.bitacora__anulables-resumen {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: var(--fs-label);
+}
+
+.bitacora__anulables-paginacion {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: var(--sp-3);
+  color: var(--text-muted);
+  font-size: var(--fs-label);
+}
+
 .bitacora__anulable {
   display: grid;
   gap: var(--sp-3);

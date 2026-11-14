@@ -20,6 +20,7 @@ const TABLAS = [
 ];
 const ACCIONES = [['insert', 'Creación'], ['update', 'Actualización'], ['delete', 'Eliminación']];
 const SIN_FILAS = [];
+const TAMANO_PAGINA_ANULACIONES = 25;
 const NOMBRES_TIPO = {
   entrada_compra: 'Entrada de compra',
   entrada_devolucion_cliente: 'Devolución de cliente',
@@ -89,6 +90,8 @@ export default function Bitacora() {
   const [accion, setAccion] = useState('');
   const [usuarioId, setUsuarioId] = useState('');
   const [busqueda, setBusqueda] = useState('');
+  const [busquedaAnulable, setBusquedaAnulable] = useState('');
+  const [paginaAnulables, setPaginaAnulables] = useState(0);
   const [limite, setLimite] = useState(200);
   const [documentoAnular, setDocumentoAnular] = useState(null);
   const [motivo, setMotivo] = useState('');
@@ -101,6 +104,22 @@ export default function Bitacora() {
   const filasVisibles = useMemo(() => filas.filter((fila) => (
     !busqueda.trim() || `${fila.registro_id || ''} ${fila.tabla}`.toLocaleLowerCase('es').includes(busqueda.trim().toLocaleLowerCase('es'))
   )), [filas, busqueda]);
+  const documentosAnulables = anulables.data || SIN_FILAS;
+  const documentosAnulablesFiltrados = useMemo(() => {
+    const texto = busquedaAnulable.trim().toLocaleLowerCase('es-SV');
+    if (!texto) return documentosAnulables;
+    return documentosAnulables.filter((documento) => (
+      `${documento.numero} ${NOMBRES_TIPO[documento.tipo] || documento.tipo} ${documento.doc_venta_numero || ''} ${documento.motivo || ''}`
+        .toLocaleLowerCase('es-SV')
+        .includes(texto)
+    ));
+  }, [documentosAnulables, busquedaAnulable]);
+  const paginasAnulables = Math.ceil(documentosAnulablesFiltrados.length / TAMANO_PAGINA_ANULACIONES);
+  const paginaAnulablesActual = Math.min(paginaAnulables, Math.max(0, paginasAnulables - 1));
+  const documentosAnulablesVisibles = documentosAnulablesFiltrados.slice(
+    paginaAnulablesActual * TAMANO_PAGINA_ANULACIONES,
+    (paginaAnulablesActual + 1) * TAMANO_PAGINA_ANULACIONES,
+  );
 
   function cambiarFiltro(setter, valor) {
     setter(valor);
@@ -228,12 +247,33 @@ export default function Bitacora() {
         </header>
         {anulables.isLoading && <EmptyState loading title="Consultando documentos aprobados…" />}
         {anulables.isError && <EmptyState icon="alerta" title="No se pudieron cargar los documentos para anular." />}
-        {!anulables.isLoading && !anulables.isError && anulables.data?.length === 0 && (
+        {!anulables.isLoading && !anulables.isError && documentosAnulables.length === 0 && (
           <div className="card"><EmptyState title="No hay movimientos aprobados que puedan anularse." /></div>
         )}
-        {!anulables.isLoading && !anulables.isError && anulables.data?.length > 0 && (
-          <div className="bitacora__anulables">
-            {anulables.data.map((documento) => {
+        {!anulables.isLoading && !anulables.isError && documentosAnulables.length > 0 && (
+          <>
+            <label className="field bitacora__busqueda-anulables">
+              <span className="field__label">Buscar documento para anular</span>
+              <input
+                className="input"
+                type="search"
+                value={busquedaAnulable}
+                onChange={(event) => {
+                  setBusquedaAnulable(event.target.value);
+                  setPaginaAnulables(0);
+                }}
+                placeholder="Número, tipo, referencia o motivo"
+              />
+            </label>
+            {documentosAnulablesFiltrados.length === 0 ? (
+              <div className="card"><EmptyState icon="search" title="No hay documentos que coincidan con la búsqueda." /></div>
+            ) : (
+              <>
+                <p className="bitacora__anulables-resumen" aria-live="polite">
+                  Mostrando {paginaAnulablesActual * TAMANO_PAGINA_ANULACIONES + 1}–{Math.min((paginaAnulablesActual + 1) * TAMANO_PAGINA_ANULACIONES, documentosAnulablesFiltrados.length)} de {documentosAnulablesFiltrados.length} documentos anulables
+                </p>
+                <div className="bitacora__anulables">
+            {documentosAnulablesVisibles.map((documento) => {
               const trasladoPendiente = documento.tipo === 'traslado' && !documento.traslado_confirmado_en;
               return (
                 <article className="card bitacora__anulable" key={documento.id}>
@@ -258,7 +298,21 @@ export default function Bitacora() {
                 </article>
               );
             })}
-          </div>
+                </div>
+                {paginasAnulables > 1 && (
+                  <nav className="bitacora__anulables-paginacion" aria-label="Paginación de documentos anulables">
+                    <button className="btn btn--secondary" type="button" onClick={() => setPaginaAnulables(paginaAnulablesActual - 1)} disabled={paginaAnulablesActual === 0}>
+                      Anterior
+                    </button>
+                    <span>Página {paginaAnulablesActual + 1} de {paginasAnulables}</span>
+                    <button className="btn btn--secondary" type="button" onClick={() => setPaginaAnulables(paginaAnulablesActual + 1)} disabled={paginaAnulablesActual + 1 >= paginasAnulables}>
+                      Siguiente
+                    </button>
+                  </nav>
+                )}
+              </>
+            )}
+          </>
         )}
       </section>
     </section>
