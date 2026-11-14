@@ -416,7 +416,9 @@ begin
 
   v_lineas_entrada := 0;
   v_lineas_salida := 0;
-  for v_linea in select value from jsonb_array_elements(p_detalles)
+  for v_linea in
+    select value from jsonb_array_elements(p_detalles)
+    order by (value ->> 'producto_id')::bigint
   loop
     if jsonb_typeof(v_linea) is distinct from 'object' then
       raise exception 'Cada linea debe ser un objeto.';
@@ -436,7 +438,8 @@ begin
 
     select p.tipo into v_producto_tipo
     from public.productos p
-    where p.id = v_producto_id and p.activo;
+    where p.id = v_producto_id and p.activo
+    for share;
     if v_producto_tipo is null then
       raise exception 'El producto % no existe o esta inactivo.', v_producto_id;
     end if;
@@ -790,6 +793,7 @@ declare
   v_fisico integer;
   v_reservado integer;
   v_reserva_anterior bigint;
+  v_producto_activo boolean;
 begin
   if (select auth.uid()) is not null and not exists (
     select 1 from public.usuarios u
@@ -833,15 +837,23 @@ begin
     raise exception 'Seleccione una vendedora activa.';
   end if;
 
-  if not exists (
-    select 1 from public.ubicaciones u
-    where u.id = new.ubicacion_id and u.activa and u.vendible
-  ) then
-    raise exception 'La reserva requiere una ubicacion vendible activa.';
-  end if;
-
   if new.estado <> 'activa' then
     return new;
+  end if;
+
+  select p.activo into v_producto_activo
+  from public.productos p
+  where p.id = new.producto_id
+  for share;
+  if not found or not v_producto_activo then
+    raise exception 'La reserva requiere un producto activo.';
+  end if;
+
+  perform 1 from public.ubicaciones u
+  where u.id = new.ubicacion_id and u.activa and u.vendible
+  for share;
+  if not found then
+    raise exception 'La reserva requiere una ubicacion vendible activa.';
   end if;
 
   perform 1
