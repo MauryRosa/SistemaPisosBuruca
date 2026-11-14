@@ -2,7 +2,7 @@
 -- Datos de DEMOSTRACIÓN solo para el entorno local (supabase db reset).
 -- No usar en producción: el catálogo real se carga desde el Excel de la empresa
 -- y las cuentas reales las crea el administrador.
--- Contraseña de las cuentas demo: Demo1234!
+-- Contraseña de las cuentas demo: DemoPisos2026!
 -- =============================================================
 
 -- ---------- Cuentas demo en Supabase Auth ----------
@@ -23,7 +23,7 @@ begin
       confirmation_token, email_change, email_change_token_new, recovery_token
     ) values (
       '00000000-0000-0000-0000-000000000000', cuenta.id, 'authenticated', 'authenticated',
-      cuenta.usuario || '@pisosburuca.local', extensions.crypt('Demo1234!', extensions.gen_salt('bf')), now(),
+      cuenta.usuario || '@pisosburuca.local', extensions.crypt('DemoPisos2026!', extensions.gen_salt('bf')), now(),
       '{"provider":"email","providers":["email"]}', '{}', now(), now(), '', '', '', ''
     );
     insert into auth.identities (id, user_id, provider_id, identity_data, provider, last_sign_in_at, created_at, updated_at)
