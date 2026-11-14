@@ -1,11 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '../lib/supabase.js';
-import { consultarTodas } from '../lib/consultarTodas.js';
-
-function comprobar(resultado) {
-  if (resultado.error) throw resultado.error;
-  return resultado.data || [];
-}
+import { consultarPorIds, consultarTodas } from '../lib/consultarTodas.js';
 
 export function useCatalogoTraslados() {
   return useQuery({
@@ -49,14 +44,31 @@ export function useTrasladosEnTransito() {
   return useQuery({
     queryKey: ['traslados', 'en-transito'],
     queryFn: async () => {
-      const { data: documentos, error } = await supabase
-        .from('documentos')
-        .select('id,serie,anio,correlativo,fecha,creado_por,motivo,es_contingencia,traslado_confirmado_en,traslado_confirmado_por')
-        .eq('tipo', 'traslado')
-        .eq('estado', 'aprobado')
-        .order('fecha', { ascending: false })
-        .limit(100);
-      if (error) throw error;
+      const [enTransito, recibidosRecientes] = await Promise.all([
+        consultarTodas(() => supabase
+          .from('documentos')
+          .select('id,serie,anio,correlativo,fecha,creado_por,motivo,es_contingencia,traslado_confirmado_en,traslado_confirmado_por')
+          .eq('tipo', 'traslado')
+          .eq('estado', 'aprobado')
+          .is('traslado_confirmado_en', null)
+          .order('fecha', { ascending: false })
+          .order('id', { ascending: false })),
+        (async () => {
+          const { data, error } = await supabase
+            .from('documentos')
+            .select('id,serie,anio,correlativo,fecha,creado_por,motivo,es_contingencia,traslado_confirmado_en,traslado_confirmado_por')
+            .eq('tipo', 'traslado')
+            .eq('estado', 'aprobado')
+            .not('traslado_confirmado_en', 'is', null)
+            .order('fecha', { ascending: false })
+            .order('id', { ascending: false })
+            .limit(100);
+          if (error) throw error;
+          return data || [];
+        })(),
+      ]);
+      const documentos = [...enTransito, ...recibidosRecientes]
+        .sort((a, b) => b.fecha.localeCompare(a.fecha) || b.id - a.id);
       if (documentos.length === 0) return [];
 
       const ids = documentos.map((documento) => documento.id);
@@ -64,31 +76,27 @@ export function useTrasladosEnTransito() {
         documento.creado_por,
         documento.traslado_confirmado_por,
       ]).filter(Boolean))];
-      const [lineasResultado, usuariosResultado] = await Promise.all([
-        supabase
+      const [lineas, usuarios] = await Promise.all([
+        consultarPorIds(ids, (grupoIds) => supabase
           .from('detalle_documento')
           .select('id,documento_id,producto_id,ubicacion_origen_id,ubicacion_destino_id,cantidad,observacion')
-          .in('documento_id', ids)
-          .order('id'),
-        supabase
+          .in('documento_id', grupoIds)
+          .order('id')),
+        consultarPorIds(usuarioIds, (grupoIds) => supabase
           .from('v_usuarios_nombres_operativos')
           .select('id,nombre')
-          .in('id', usuarioIds),
+          .in('id', grupoIds)),
       ]);
-      const lineas = comprobar(lineasResultado);
-      const usuarios = comprobar(usuariosResultado);
       const productoIds = [...new Set(lineas.map((linea) => linea.producto_id))];
       const ubicacionIds = [...new Set(lineas.flatMap((linea) => [linea.ubicacion_origen_id, linea.ubicacion_destino_id]))];
-      const [productosResultado, ubicacionesResultado] = await Promise.all([
-        productoIds.length
-          ? supabase.from('productos').select('id,codigo,nombre,tipo,unidad,piezas_por_caja').in('id', productoIds)
-          : Promise.resolve({ data: [], error: null }),
-        ubicacionIds.length
-          ? supabase.from('ubicaciones').select('id,nombre').in('id', ubicacionIds)
-          : Promise.resolve({ data: [], error: null }),
+      const [productos, ubicaciones] = await Promise.all([
+        consultarPorIds(productoIds, (grupoIds) => supabase.from('productos')
+          .select('id,codigo,nombre,tipo,unidad,piezas_por_caja')
+          .in('id', grupoIds)),
+        consultarPorIds(ubicacionIds, (grupoIds) => supabase.from('ubicaciones')
+          .select('id,nombre')
+          .in('id', grupoIds)),
       ]);
-      const productos = comprobar(productosResultado);
-      const ubicaciones = comprobar(ubicacionesResultado);
       const porProducto = new Map(productos.map((producto) => [producto.id, producto]));
       const porUbicacion = new Map(ubicaciones.map((ubicacion) => [ubicacion.id, ubicacion.nombre]));
       const porUsuario = new Map(usuarios.map((usuario) => [usuario.id, usuario.nombre]));

@@ -363,7 +363,7 @@ export default function Traslados() {
         <div className="traslados__historial-cabecera">
           <div>
             <h2 id="traslados-historial-titulo">Traslados recientes</h2>
-            <p>Incluye envíos en tránsito y recibidos.</p>
+            <p>Incluye todos los envíos en tránsito y los 100 recibidos más recientes.</p>
           </div>
           <button className="btn btn--secondary" type="button" onClick={() => transferencias.refetch()} disabled={transferencias.isFetching}>
             {transferencias.isFetching ? 'Actualizando…' : 'Actualizar'}
