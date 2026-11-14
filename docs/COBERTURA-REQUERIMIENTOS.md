@@ -42,7 +42,7 @@ Contraste de la matriz `Vault_Pisos_Buruca/03 Requerimientos` con el código de 
 | RF-34 | Persistencia en piezas/unidades base y presentación como cajas+piezas en `src/lib/unidades.js`; la interfaz no muestra m². |
 | RF-35 | Apertura de caja se registra como documento trazable sin modificar existencias. |
 | RF-36 | Físico, reservado y disponible por ubicación en `ConsultaStock.jsx`; cambios de reservas envían una invalidación privada sin exponer sus filas. |
-| RF-37 | Conteos totales o por categoría; ajustes en documentos atómicos con aprobación administrativa en `Conteos.jsx`. |
+| RF-37 | Conteos totales o por categoría; el catálogo y stock se cargan por páginas para incluir todos los productos activos, y los ajustes se aplican como documentos atómicos con aprobación administrativa en `Conteos.jsx`. |
 | RF-38 | Reporte de salidas por periodo en `Reportes.jsx`. |
 | RF-39 | Kardex, movimientos, mermas y bajo mínimo; exportación CSV compatible con Excel. |
 | RF-40 | Login, rutas protegidas, menú por rol, RLS y cuentas administradas en `AuthProvider.jsx`, `ProtectedRoute.jsx` y `Usuarios.jsx`. |
