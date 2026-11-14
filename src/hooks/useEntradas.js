@@ -1,11 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '../lib/supabase.js';
-import { consultarTodas } from '../lib/consultarTodas.js';
-
-function comprobar(resultado) {
-  if (resultado.error) throw resultado.error;
-  return resultado.data || [];
-}
+import { consultarPorIds, consultarTodas } from '../lib/consultarTodas.js';
 
 export function useCatalogoEntradas() {
   return useQuery({
@@ -31,9 +26,10 @@ export function useCatalogoEntradas() {
           .order('id', { ascending: false })),
       ]);
       const proveedorIds = [...new Set(ordenes.map((orden) => orden.proveedor_id))];
-      const proveedores = proveedorIds.length
-        ? comprobar(await supabase.from('proveedores').select('id,nombre').in('id', proveedorIds))
-        : [];
+      const proveedores = await consultarPorIds(proveedorIds, (ids) => supabase
+        .from('proveedores')
+        .select('id,nombre')
+        .in('id', ids));
       const porProveedor = new Map(proveedores.map((proveedor) => [proveedor.id, proveedor.nombre]));
 
       return {
@@ -53,18 +49,16 @@ export function useDetalleOrdenEntrada(ordenId) {
     queryKey: ['entrada', 'orden', ordenId],
     enabled: Boolean(ordenId),
     queryFn: async () => {
-      const detalles = comprobar(await supabase
+      const detalles = await consultarTodas(() => supabase
         .from('detalle_orden_pedido')
         .select('id,producto_id,cantidad,cantidad_recibida')
         .eq('orden_pedido_id', ordenId)
         .order('id'));
       const productoIds = [...new Set(detalles.map((detalle) => detalle.producto_id))];
-      const productos = productoIds.length
-        ? comprobar(await supabase
-          .from('productos')
-          .select('id,codigo,nombre,tipo,unidad,piezas_por_caja')
-          .in('id', productoIds))
-        : [];
+      const productos = await consultarPorIds(productoIds, (ids) => supabase
+        .from('productos')
+        .select('id,codigo,nombre,tipo,unidad,piezas_por_caja')
+        .in('id', ids));
       const porProducto = new Map(productos.map((producto) => [producto.id, producto]));
       return detalles.map((detalle) => ({ ...detalle, producto: porProducto.get(detalle.producto_id) }));
     },
@@ -93,7 +87,7 @@ export function useExistenciasIniciales(ubicacionId) {
   return useQuery({
     queryKey: ['entrada', 'existencias-iniciales', ubicacionId],
     enabled: Boolean(ubicacionId),
-    queryFn: async () => comprobar(await supabase
+    queryFn: () => consultarTodas(() => supabase
       .from('existencias')
       .select('producto_id,cantidad')
       .eq('ubicacion_id', ubicacionId)

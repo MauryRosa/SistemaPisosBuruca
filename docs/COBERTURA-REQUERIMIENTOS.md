@@ -18,7 +18,7 @@ La fuente oficial `RequerimientosDeSistema.pdf` fija 41 RF y 17 RNF. `Modelo de 
 | RF-08 | Altas de ubicaciones configurables en `Ubicaciones.jsx` y `useUbicaciones.js`. |
 | RF-09 | Creación y cierre de órdenes por administración y ventas en `Pedidos.jsx`; el historial permite buscar y recorrer todas las órdenes. Correlativos y validación transaccional en `20261114105835_pedidos_con_correlativo.sql`. |
 | RF-10 | Recepción ligada a la orden y al número de factura o remisión en `Entradas.jsx` y `registrar_movimiento_core`. |
-| RF-11 | Cantidades solicitadas/recibidas, faltantes, sobrantes y observaciones en `Entradas.jsx`; la base exige observación al exceder la orden (`20261114124108_require_observation_for_purchase_overage.sql`). |
+| RF-11 | Cantidades solicitadas/recibidas, faltantes, sobrantes y observaciones en `Entradas.jsx`; la base exige observación al exceder la orden (`20261114124108_require_observation_for_purchase_overage.sql`). Las líneas de la orden y existencias iniciales recorren todas las páginas; productos y proveedores se consultan por lotes. |
 | RF-12 | Captura de cajas y piezas convertida a unidad base en `Entradas.jsx` y `src/lib/unidades.js`. |
 | RF-13 | Devolución ligada a una venta y cambio/garantía en `Entradas.jsx`; origen y cantidades acumuladas validados en `20261114105813_validar_devolucion_cliente.sql`. |
 | RF-14 | Registro de inventario inicial por ubicación en `Entradas.jsx` y RPC transaccional. |
