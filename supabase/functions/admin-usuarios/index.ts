@@ -1,7 +1,11 @@
-import { createClient } from 'npm:@supabase/supabase-js@2';
+import { createClient } from 'npm:@supabase/supabase-js@2.47.10';
 
+// Origen permitido: ALLOWED_ORIGIN (ej. https://inventario.ejemplo.com). Sin definirlo se mantiene '*',
+// que es seguro aquí porque la función exige un token Bearer y no usa cookies.
+const origenPermitido = Deno.env.get('ALLOWED_ORIGIN')?.trim() || '*';
 const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Origin': origenPermitido,
+  'Vary': 'Origin',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
 };
