@@ -6,16 +6,32 @@ function comprobar(resultado) {
   return resultado.data || [];
 }
 
+async function comprobarTodas(crearConsulta) {
+  const resultados = [];
+  const tamanoPagina = 500;
+  for (let desde = 0; ; desde += tamanoPagina) {
+    const pagina = comprobar(await crearConsulta().range(desde, desde + tamanoPagina - 1));
+    resultados.push(...pagina);
+    if (pagina.length < tamanoPagina) return resultados;
+  }
+}
+
 export function useCatalogoConteos() {
   return useQuery({
     queryKey: ['catalogo-conteos'],
     queryFn: async () => {
-      const [productosResultado, ubicacionesResultado] = await Promise.all([
-        supabase.from('productos').select('id,codigo,nombre,tipo,categoria,unidad,piezas_por_caja').eq('activo', true).order('nombre'),
-        supabase.from('ubicaciones').select('id,nombre,tipo').eq('activa', true).order('nombre'),
+      const [productos, ubicaciones] = await Promise.all([
+        comprobarTodas(() => supabase.from('productos')
+          .select('id,codigo,nombre,tipo,categoria,unidad,piezas_por_caja')
+          .eq('activo', true)
+          .order('nombre')
+          .order('id')),
+        comprobarTodas(() => supabase.from('ubicaciones')
+          .select('id,nombre,tipo')
+          .eq('activa', true)
+          .order('nombre')
+          .order('id')),
       ]);
-      const productos = comprobar(productosResultado);
-      const ubicaciones = comprobar(ubicacionesResultado);
       return { productos, ubicaciones, categorias: [...new Set(productos.map((producto) => producto.categoria))].sort() };
     },
   });
@@ -25,11 +41,12 @@ export function useStockConteo(ubicacionId) {
   return useQuery({
     queryKey: ['conteos', 'stock', ubicacionId],
     enabled: Boolean(ubicacionId),
-    queryFn: async () => comprobar(await supabase
+    queryFn: () => comprobarTodas(() => supabase
       .from('v_stock')
       .select('producto_id,fisico')
       .eq('ubicacion_id', ubicacionId)
-      .order('nombre')),
+      .order('nombre')
+      .order('producto_id')),
   });
 }
 
