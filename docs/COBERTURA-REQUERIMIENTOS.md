@@ -72,7 +72,7 @@ La fuente oficial `RequerimientosDeSistema.pdf` fija 41 RF y 17 RNF. `Modelo de 
 | RNF-14 | Pendiente revisión real de compañeros en PR. Las autorías no se asignan a personas que no hayan hecho el trabajo. |
 | RNF-15 | Stock, conteos, proveedores, usuarios, catálogos de entradas/pedidos/salidas/traslados/reportes, bajo mínimo, historial de reservas, órdenes, documentos anulables y colas de aprobación recorren resultados y líneas relacionadas por páginas o grupos. Pendiente medir crecimiento y rendimiento con volumen representativo; no hay evidencia para afirmar escalabilidad en producción. |
 | RNF-16 | CSV implementado; integración con facturación queda fuera del alcance de esta versión. |
-| RNF-17 | Código y dependencias de código abierto; falta elegir plan y documentar el costo operativo real. La organización actual usa Free y ya tiene sus dos proyectos activos; el proyecto de Pisos Buruca no existe. Pro inicia en USD 25/mes, sujeto al costo total de la organización. |
+| RNF-17 | Código y dependencias de código abierto; falta confirmar y documentar el costo operativo de la organización que aloja el proyecto. La cuenta Supabase conectada usa Free y tiene dos proyectos activos; el usuario indica que Pisos Buruca está en otra cuenta, cuyo plan y costo todavía no se verifican. |
 
 ## Verificación realizada
 
@@ -80,11 +80,11 @@ La fuente oficial `RequerimientosDeSistema.pdf` fija 41 RF y 17 RNF. `Modelo de 
 - `npm run lint`: correcto.
 - `npm run build`: correcto; Vite transformó 223 módulos.
 - `git diff --check`: correcto.
-- No se ejecutó la suite automatizada ni una base PostgreSQL: `supabase status` no pudo inspeccionar Podman porque no puede ajustar `/run/user/1000/libpod` (`read-only file system`).
-- La lista Supabase consultada el 14/11/2026 mostró `Gnd Code` en Free con `SIA-U` y `UNIVO-Sistema-Contable` activos, sin proyecto Pisos Buruca. La cotización de creación devolvió USD 0/mes, pero no elimina el límite de dos proyectos del plan actual. No se aplicaron migraciones ni se desplegó Edge Function.
-- La búsqueda del proyecto `Pisos Buruca` en la cuenta conectada de Vercel no encontró un proyecto ni despliegues asociados.
+- `npm test`: 5 pruebas unitarias de `src/lib/unidades.test.js` pasaron. No se ejecutaron pruebas de PostgreSQL: no había una base local disponible (`127.0.0.1:54322` rechazó la conexión), así que las migraciones y los flujos de datos siguen sin validación de runtime.
+- La cuenta Supabase conectada consultada el 14/11/2026 muestra la organización Gnd Code en Free, con SIA-U y UNIVO-Sistema-Contable; Pisos Buruca no aparece en esa cuenta. El usuario indica que el proyecto está en otra cuenta, cuyo acceso y estado no se han verificado. La cotización de USD 0 y el límite de dos proyectos aplican solo a crear otro proyecto en Gnd Code.
+- La cuenta Vercel conectada no muestra un proyecto ni despliegues de Pisos Buruca; no se verificaron otras cuentas.
 - La rama integrada sigue local y no se publicó en GitHub.
-- `variablesDB.txt` está en el directorio padre del repositorio, con permisos `0600`, y no forma parte de Git; no se leyó su contenido. Los archivos `.env` están ignorados.
+- variablesDB.txt está en el directorio padre del repositorio, con permisos 0600, y no forma parte de Git; no se leyó su contenido. El archivo .env local tiene permisos 0600 y está ignorado por Git; su clave no se abrió ni se registró.
 
 ## Criterio de cierre
 
