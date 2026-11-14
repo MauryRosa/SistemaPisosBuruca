@@ -81,6 +81,7 @@ La fuente oficial `RequerimientosDeSistema.pdf` fija 41 RF y 17 RNF. `Modelo de 
 - `git diff --check`: correcto.
 - No se ejecutó la suite automatizada ni una base PostgreSQL: `supabase status` no pudo inspeccionar Podman porque no puede ajustar `/run/user/1000/libpod` (`read-only file system`).
 - La lista Supabase consultada el 14/11/2026 mostró `Gnd Code` en Free con `SIA-U` y `UNIVO-Sistema-Contable` activos, sin proyecto Pisos Buruca. La cotización de creación devolvió USD 0/mes, pero no elimina el límite de dos proyectos del plan actual. No se aplicaron migraciones ni se desplegó Edge Function.
+- La búsqueda del proyecto `Pisos Buruca` en la cuenta conectada de Vercel no encontró un proyecto ni despliegues asociados.
 - La rama integrada sigue local y no se publicó en GitHub.
 - `variablesDB.txt` está en el directorio padre del repositorio, con permisos `0600`, y no forma parte de Git; no se leyó su contenido. Los archivos `.env` están ignorados.
 
