@@ -77,7 +77,7 @@ Contraste de la matriz `Vault_Pisos_Buruca/03 Requerimientos` con el código de 
 - `npm run lint`: correcto.
 - `npm run build`: correcto; Vite transformó 222 módulos.
 - `git diff --check`: correcto.
-- No se ejecutó la suite automatizada ni una base PostgreSQL: el runtime local de Podman no puede crear su espacio de usuario en este entorno (`newuidmap` devuelve `Operation not permitted`).
+- No se ejecutó la suite automatizada ni una base PostgreSQL: `supabase status` no pudo inspeccionar Podman porque no puede ajustar `/run/user/1000/libpod` (`read-only file system`).
 - La lista de proyectos Supabase consultada el 14/11/2026 mostró `SIA-U` y `UNIVO-Sistema-Contable`, sin proyecto Pisos Buruca. La primera consulta falló y el reintento recuperó la lista. No se aplicaron migraciones ni se desplegó Edge Function.
 - La rama integrada sigue local y no se publicó en GitHub.
 - `variablesDB.txt` no está presente ni versionado; los archivos `.env` están ignorados. No se leyó su contenido.

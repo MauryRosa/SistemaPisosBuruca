@@ -40,4 +40,4 @@ Referencias: [Auth sessions](https://supabase.com/docs/guides/auth/sessions), [d
 - [ ] Verificar respaldos diarios y una restauración mensual.
 - [ ] Obtener revisión real de otro integrante en GitHub antes de cerrar los PR.
 
-El lint y la compilación pasan tanto por rama como en una copia temporal integrada; las casillas anteriores requieren una instancia Supabase accesible, un despliegue y revisión del equipo.
+`npm run lint` y `npm run build` pasan en la rama actual. Las casillas anteriores aún requieren una instancia Supabase accesible, un despliegue y revisión del equipo.
