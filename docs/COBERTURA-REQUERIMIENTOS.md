@@ -1,55 +1,86 @@
-# Cobertura de requisitos del sistema
+# Cobertura y aceptación de requisitos
 
-Estado revisado contra la matriz `Vault_Pisos_Buruca/03 Requerimientos`. Esta lista describe el código fuente local; no equivale a evidencia de un despliegue ni a una prueba de aceptación.
+Contraste de la matriz `Vault_Pisos_Buruca/03 Requerimientos` con el código de esta rama. La columna de cobertura indica dónde está implementada cada regla; no sustituye las pruebas de aceptación descritas después.
 
-## Requerimientos funcionales
+## Requisitos funcionales
 
-| Requisito | Cobertura en el sistema |
+| Requisito | Implementación local |
 |---|---|
-| RF-01–05 | Catálogo de productos, tipo de producto, unidades, proveedor, mínimo y activación en `Catalogo.jsx` y `Proveedores.jsx`. |
-| RF-06–08 | Ubicaciones configurables y existencias por ubicación en `Ubicaciones.jsx` y `ConsultaStock.jsx`. |
-| RF-09 | Órdenes de pedido creadas por administración y ventas en `Pedidos.jsx`. |
-| RF-10–12 | Recepción vinculada a OP y factura/remisión; comparación solicitado, recibido, faltante, sobrante y observación de daño; cantidades en cajas y piezas en `Entradas.jsx`. |
-| RF-13–14 | Devolución vinculada a venta, cambios/garantías e inventario inicial en `Entradas.jsx`; validación de origen y acumulado en migraciones SQL. |
-| RF-15–18 | Salidas con tipo, documento, responsable, fecha, comprobante único y metadatos en `Salidas.jsx` y `movimientos_transaccionales.sql`. |
-| RF-19 | Traslados con emisión, estado en tránsito y confirmación de recepción en `Traslados.jsx`. |
-| RF-20–24 | Mermas pendientes con evidencia y aprobación; consumo, exhibición, devolución a proveedor y cambio con entrada/salida atómicas en `Entradas.jsx`, `Salidas.jsx` y RPC. |
-| RF-25 | Anulación con motivo, movimiento inverso y bloqueo de casos no reversibles en `anulaciones_y_apertura_caja.sql`. |
-| RF-26–28 | Reservas, reducción del disponible, consumo al despachar y cancelación con motivo en `Reservas.jsx` y RPC. |
-| RF-29 | Correlativos por serie y año, asignados en servidor. |
-| RF-30–32 | Persona que retira, placa y evidencia; impresión/guardado en PDF; despacho desde minibodega en `Salidas.jsx`. |
-| RF-33–35 | Captura de cajas y piezas, almacenamiento en unidad base y apertura de caja trazable sin modificar existencias en `Salidas.jsx`. |
-| RF-36 | Físico, reservado y disponible por ubicación; la consulta invalida caché al recibir cambios de Realtime. |
-| RF-37 | Conteo físico y aplicación de ajustes mediante aprobación administrativa en `Conteos.jsx`. |
-| RF-38–39 | Reporte de salidas, kardex, movimientos, mermas y bajo mínimo; exportación CSV compatible con Excel en `Reportes.jsx`. |
-| RF-40 | Inicio de sesión y permisos por rol en Auth, rutas protegidas y RLS. |
-| RF-41 | Bitácora con usuario, acción, fecha y datos antes/después; lectura administrativa y sin mutaciones para usuarios autenticados. |
+| RF-01 | SKU, nombre, tipo, categoría, medida y proveedor en `Catalogo.jsx`; el proveedor es obligatorio en formulario y base (`20261114105838_requerir_proveedor_producto.sql`). |
+| RF-02 | Pisos y accesorios, unidades base y empaque en `Catalogo.jsx`; restricciones de producto en `20261013000001_esquema_inicial.sql`. |
+| RF-03 | Modo caja/pieza/ambos en catálogo; validación del despacho en `20261114105044_validar_modo_despacho.sql`. |
+| RF-04 | Stock mínimo por producto, vista de bajo mínimo en dashboard y reporte. |
+| RF-05 | Activación y desactivación de productos sin borrar; protección de productos con operaciones abiertas en `20261114105812_proteger_catalogo_con_historial.sql`. |
+| RF-06 | Ubicaciones tipo bodega y minibodega, inicializadas para desarrollo en `supabase/seed.sql`. |
+| RF-07 | Existencias por producto y ubicación; consulta en `v_stock`. |
+| RF-08 | Altas de ubicaciones configurables en `Ubicaciones.jsx` y `useUbicaciones.js`. |
+| RF-09 | Creación y cierre de órdenes por administración y ventas en `Pedidos.jsx`; correlativos y validación transaccional en `20261114105835_pedidos_con_correlativo.sql`. |
+| RF-10 | Recepción ligada a la orden y al número de factura o remisión en `Entradas.jsx` y `registrar_movimiento_core`. |
+| RF-11 | Cantidades solicitadas/recibidas, faltantes, sobrantes y observaciones en `Entradas.jsx`; acumulados validados en base de datos. |
+| RF-12 | Captura de cajas y piezas convertida a unidad base en `Entradas.jsx` y `src/lib/unidades.js`. |
+| RF-13 | Devolución ligada a una venta y cambio/garantía en `Entradas.jsx`; origen y cantidades acumuladas validados en `20261114105813_validar_devolucion_cliente.sql`. |
+| RF-14 | Registro de inventario inicial por ubicación en `Entradas.jsx` y RPC transaccional. |
+| RF-15 | Cada documento conserva tipo, serie/correlativo, fecha, creador y detalle en `documentos` y `detalle_documento`. |
+| RF-16 | Salida por factura exige tipo y número en formulario y RPC. |
+| RF-17 | Salida por recibo exige tipo y número en formulario y RPC. |
+| RF-18 | Índice único conserva cada comprobante de salida incluso después de anularla (`20261114105839_conservar_unicidad_de_comprobantes.sql`). |
+| RF-19 | Envío y confirmación de traslados con serie propia en `Traslados.jsx` y RPC. |
+| RF-20 | Merma pendiente, carta privada obligatoria y aprobación administrativa en `Salidas.jsx`, `Aprobaciones.jsx` y RPC. |
+| RF-21 | Consumo interno con motivo y salida trazable en `Salidas.jsx`. |
+| RF-22 | Existencias de exhibición en una ubicación separada y no vendible; los traslados permiten esa ubicación. |
+| RF-23 | Devolución a proveedor ligada a la recepción original y al documento del proveedor. |
+| RF-24 | Cambio captura devolución y reemplazo dentro de una sola llamada transaccional. |
+| RF-25 | Anulación con motivo y movimiento inverso; casos no reversibles se bloquean en `20261114105810_anulaciones_y_apertura_caja.sql`. |
+| RF-26 | Jefatura de bodega crea reservas para una vendedora en `Reservas.jsx`. |
+| RF-27 | La vista de stock calcula disponible como físico menos reservas activas. |
+| RF-28 | Despacho consume la reserva coincidente; cancelación requiere motivo. |
+| RF-29 | Correlativos de servidor por serie/año, iniciados en 00001, mediante `correlativos`. |
+| RF-30 | Nombre de quien retira, placa obligatoria (`Salidas.jsx` y `20261114105837_requerir_placa_en_despachos.sql`) y firma/foto privada; el comprobante se puede imprimir. |
+| RF-31 | Vista de comprobante de salida preparada para imprimir o guardar como PDF desde el navegador. |
+| RF-32 | Despacho desde minibodega en formulario y RPC, que valida el tipo de ubicación. |
+| RF-33 | Captura de cajas+piezas para pisos y unidad simple para accesorios en formularios de movimientos. |
+| RF-34 | Persistencia en piezas/unidades base y presentación como cajas+piezas en `src/lib/unidades.js`; la interfaz no muestra m². |
+| RF-35 | Apertura de caja se registra como documento trazable sin modificar existencias. |
+| RF-36 | Físico, reservado y disponible por ubicación en `ConsultaStock.jsx`; Realtime invalida la consulta. |
+| RF-37 | Conteos totales o por categoría; ajustes en documentos atómicos con aprobación administrativa en `Conteos.jsx`. |
+| RF-38 | Reporte de salidas por periodo en `Reportes.jsx`. |
+| RF-39 | Kardex, movimientos, mermas y bajo mínimo; exportación CSV compatible con Excel. |
+| RF-40 | Login, rutas protegidas, menú por rol, RLS y cuentas administradas en `AuthProvider.jsx`, `ProtectedRoute.jsx` y `Usuarios.jsx`. |
+| RF-41 | Triggers registran actor, acción, momento y antes/después; lectura administrativa y sin mutaciones por el rol de aplicación. |
 
-**Estado RF:** las funciones están representadas en el código y las migraciones locales. Falta aplicar y validar el conjunto completo contra una base Supabase desde cero y recorrer los flujos con cuentas de cada rol.
+**Estado de RF:** los 41 requisitos tienen implementación local identificada. No están aceptados operacionalmente hasta aplicar las migraciones desde cero y recorrer los flujos con usuarios de cada rol.
 
-## Requerimientos no funcionales
+## Requisitos no funcionales
 
-| Requisito | Estado y evidencia necesaria |
+| Requisito | Implementación y estado de aceptación |
 |---|---|
-| RNF-01–03 | Se implementan mediante restricciones, RPC transaccionales, permisos y anulaciones. Falta ejecutar la suite de base de datos contra PostgreSQL. |
-| RNF-04 | La consulta de stock se suscribe a cambios de existencias y reservas. El requisito de menos de cinco segundos requiere medirlo en el entorno alojado. |
-| RNF-05 | **Pendiente de acreditar:** hace falta una medición de menos de dos segundos con seis usuarios y datos representativos. |
-| RNF-06 | Formularios directos y en español; el límite de un minuto y tres pantallas requiere prueba con personal de bodega. |
-| RNF-07 | CSS adaptable, búsqueda por código/nombre y controles táctiles de 48 px implementados; falta revisión con dispositivos reales. |
-| RNF-08–09 | **Dependen del entorno:** verificar disponibilidad durante horario de operación y conectividad en sala y bodega. |
-| RNF-10 | En local: Supabase Auth y RLS, mínimo de 12 caracteres, JWT de 1 hora, sesión máxima de 24 horas e inactividad de 8 horas; el navegador cierra a los 30 minutos. **Pendiente en hosting:** no hay un proyecto Pisos Buruca conectado. Supabase ofrece los límites server-side de sesión solo en plan Pro; hay que confirmar el plan y aplicar los mismos ajustes alojados. |
-| RNF-11 | **Pendiente de despliegue:** confirmar HTTPS en el dominio de producción. |
-| RNF-12 | **Pendiente de operación:** activar respaldos diarios y conservar evidencia de restauración mensual. |
-| RNF-13 | Las mutaciones de bitácora están bloqueadas para usuarios autenticados; la retención de cinco años exige configurar y verificar respaldos/retención en producción. |
-| RNF-14 | Requiere revisión real de integrantes. No se atribuirán commits ni aprobaciones a quien no los haya realizado. |
-| RNF-15 | **Pendiente de medir:** validar crecimiento y rendimiento con volumen representativo antes de afirmar escalabilidad. |
-| RNF-16 | Exportación CSV implementada; no se incluye integración con facturación, según el alcance aprobado. |
-| RNF-17 | Código basado en tecnologías abiertas; el costo total depende del proveedor y plan de despliegue elegidos. |
+| RNF-01 | Los roles de aplicación no borran documentos ni bitácora; se corrige con anulaciones o ajustes. Requiere comprobar en PostgreSQL. |
+| RNF-02 | Restricción no negativa y bloqueos de filas en las operaciones de stock. Requiere probar concurrencia en PostgreSQL. |
+| RNF-03 | RPC transaccionales para movimientos, reservas, conteos, pedidos y anulaciones. Aplicación de migraciones pendiente. |
+| RNF-04 | Realtime configurado para existencias y reservas; falta medir el límite de cinco segundos en el entorno alojado. |
+| RNF-05 | Pendiente: medir menos de dos segundos con seis usuarios y datos representativos. |
+| RNF-06 | Flujos en español y formularios directos; falta cronometrar una salida con personal de bodega y confirmar el límite de tres pantallas. |
+| RNF-07 | CSS adaptable, búsqueda por código/nombre y objetivos táctiles de 48 px; falta revisar en PC, celular y tablet reales. |
+| RNF-08 | Pendiente de un despliegue y medición de disponibilidad durante horario de operación. |
+| RNF-09 | Pendiente de probar conectividad desde sala de ventas y bodega. |
+| RNF-10 | Auth, RLS, mínimo local de 12 caracteres, JWT de una hora y cierre por inactividad configurados en el repositorio; falta aplicar y revisar los mismos límites en el proyecto alojado. |
+| RNF-11 | HTTPS depende del dominio y despliegue final; no verificado. |
+| RNF-12 | Pendiente configurar respaldos diarios y guardar evidencia de una restauración mensual. |
+| RNF-13 | Las mutaciones de bitácora están restringidas al rol de aplicación; la retención verificable de cinco años depende de respaldos y política operativa. |
+| RNF-14 | Pendiente revisión real de compañeros en PR. Las autorías no se asignan a personas que no hayan hecho el trabajo. |
+| RNF-15 | Pendiente medir crecimiento y rendimiento con volumen representativo; no hay evidencia para afirmar escalabilidad en producción. |
+| RNF-16 | CSV implementado; integración con facturación queda fuera del alcance de esta versión. |
+| RNF-17 | Código y dependencias de código abierto; falta elegir proveedor/plan y documentar el costo operativo real. |
 
-## Límites de esta revisión
+## Verificación realizada
 
-- La regla de contingencia en papel se registra en los movimientos y reportes. La matriz enumera RF-01 a RF-41; no se inventó un RF-42.
-- El usuario conectado no tiene un proyecto Supabase llamado Pisos Buruca disponible; no se aplicaron migraciones ni se desplegó la función.
-- El entorno local no puede iniciar el contenedor de Postgres porque Podman no puede modificar su configuración de usuario.
-- `pnpm lint` y `pnpm build` pasan en las cuatro ramas y en una copia temporal integrada con proveedores, ubicaciones, pedidos y movimientos. No se ejecutaron pruebas automatizadas.
-- No hay evidencia actual de despliegue, respaldo/restauración, rendimiento bajo carga ni revisión por pares de estos cambios.
+- `npm run lint`: correcto.
+- `npm run build`: correcto; Vite transformó 222 módulos.
+- `git diff --check`: correcto.
+- No se ejecutó la suite automatizada ni una base PostgreSQL: el runtime local de Podman no puede crear su espacio de usuario en este entorno (`newuidmap` devuelve `Operation not permitted`).
+- La consulta del proveedor Supabase falló por conexión en esta revisión. No se aplicaron migraciones, no se desplegó Edge Function y no se publicó la rama.
+- `variablesDB.txt` no está presente ni versionado; los archivos `.env` están ignorados. No se leyó su contenido.
+
+## Criterio de cierre
+
+El código cubre los requisitos funcionales, pero el proyecto todavía no tiene evidencia suficiente para declararse aceptado al 100%. Para cerrar los RNF pendientes se requiere una instancia Supabase de Pisos Buruca, despliegue HTTPS, pruebas de aceptación y rendimiento, operación de respaldos/restauración y revisión real por compañeros.
