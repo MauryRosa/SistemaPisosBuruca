@@ -35,7 +35,7 @@ async function consultarAprobaciones(pagina, tamanoPagina) {
     if (!evidencia) return [documento.id, null];
     const { data, error: evidenciaError } = await supabase.storage
       .from('evidencias-movimientos')
-      .createSignedUrl(evidencia, 3600);
+      .createSignedUrl(evidencia, 300);
     return [documento.id, evidenciaError ? null : data.signedUrl];
   }));
 
