@@ -2,6 +2,7 @@ import { useDeferredValue, useMemo, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { z } from 'zod';
 import { supabase } from '../lib/supabase.js';
+import { consultarTodas } from '../lib/consultarTodas.js';
 import EmptyState from '../components/ui/EmptyState.jsx';
 import StatusBadge from '../components/ui/StatusBadge.jsx';
 import '../css/proveedores.css';
@@ -50,13 +51,11 @@ export default function Proveedores() {
   const consulta = useQuery({
     queryKey: ['proveedores'],
     queryFn: async () => {
-      const { data, error } = await supabase
+      return consultarTodas(() => supabase
         .from('proveedores')
         .select('id, nombre, contacto, telefono, correo, activo')
         .order('nombre')
-        .limit(500);
-      if (error) throw error;
-      return data;
+        .order('id'));
     },
   });
 

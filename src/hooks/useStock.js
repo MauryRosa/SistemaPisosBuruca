@@ -1,22 +1,11 @@
 import { useEffect } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '../lib/supabase.js';
+import { consultarTodas } from '../lib/consultarTodas.js';
 
 // Quita caracteres que alteran el filtro "or" de PostgREST
 const limpiar = (texto) => texto.replace(/[%,()*]/g, ' ').trim();
 const TAMANO_PAGINA_STOCK = 100;
-const TAMANO_PAGINA_FILTROS = 500;
-
-async function consultarTodas(crearConsulta) {
-  const resultados = [];
-  for (let desde = 0; ; desde += TAMANO_PAGINA_FILTROS) {
-    const { data, error } = await crearConsulta().range(desde, desde + TAMANO_PAGINA_FILTROS - 1);
-    if (error) throw error;
-    const pagina = data || [];
-    resultados.push(...pagina);
-    if (pagina.length < TAMANO_PAGINA_FILTROS) return resultados;
-  }
-}
 
 // Stock consolidado (todas las ubicaciones) o de una ubicación (RF-36)
 export function useStock({ busqueda, ubicacionId, categoria, soloBajoMinimo, pagina = 0 }) {

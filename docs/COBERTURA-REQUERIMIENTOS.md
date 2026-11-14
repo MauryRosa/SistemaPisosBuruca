@@ -33,7 +33,7 @@ La fuente oficial `RequerimientosDeSistema.pdf` fija 41 RF y 17 RNF. `Modelo de 
 | RF-23 | Devolución a proveedor ligada a la recepción original y al documento del proveedor. |
 | RF-24 | Cambio captura devolución y reemplazo dentro de una sola llamada transaccional. |
 | RF-25 | Anulación con motivo y movimiento inverso; casos no reversibles se bloquean en `20261114105810_anulaciones_y_apertura_caja.sql`. |
-| RF-26 | Jefatura de bodega crea reservas para una vendedora en `Reservas.jsx`. |
+| RF-26 | Jefatura de bodega crea reservas para una vendedora en `Reservas.jsx`; el historial y los catálogos asociados recuperan todos los registros por páginas. |
 | RF-27 | La vista de stock calcula disponible como físico menos reservas activas; `v_reservas_stock_activas` entrega solo totales a perfiles activos y mantiene privadas las filas de reservas. |
 | RF-28 | Despacho consume la reserva coincidente; cancelación requiere motivo. |
 | RF-29 | Correlativos de servidor por serie/año, iniciados en 00001, mediante `correlativos`. |
@@ -70,7 +70,7 @@ La fuente oficial `RequerimientosDeSistema.pdf` fija 41 RF y 17 RNF. `Modelo de 
 | RNF-12 | Pendiente configurar respaldos diarios y guardar evidencia de una restauración mensual. |
 | RNF-13 | Las mutaciones de bitácora están restringidas al rol de aplicación; la retención verificable de cinco años depende de respaldos y política operativa. |
 | RNF-14 | Pendiente revisión real de compañeros en PR. Las autorías no se asignan a personas que no hayan hecho el trabajo. |
-| RNF-15 | Consulta de stock y carga de filtros recorren resultados por páginas, evitando el límite fijo de 500 productos. Pendiente medir crecimiento y rendimiento con volumen representativo; no hay evidencia para afirmar escalabilidad en producción. |
+| RNF-15 | Stock, conteos, proveedores, catálogos de reservas e historial de reservas recorren resultados por páginas para evitar límites fijos de filas. Pendiente medir crecimiento y rendimiento con volumen representativo; no hay evidencia para afirmar escalabilidad en producción. |
 | RNF-16 | CSV implementado; integración con facturación queda fuera del alcance de esta versión. |
 | RNF-17 | Código y dependencias de código abierto; falta elegir proveedor/plan y documentar el costo operativo real. |
 

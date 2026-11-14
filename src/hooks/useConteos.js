@@ -1,19 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '../lib/supabase.js';
+import { consultarTodas } from '../lib/consultarTodas.js';
 
 function comprobar(resultado) {
   if (resultado.error) throw resultado.error;
   return resultado.data || [];
-}
-
-async function comprobarTodas(crearConsulta) {
-  const resultados = [];
-  const tamanoPagina = 500;
-  for (let desde = 0; ; desde += tamanoPagina) {
-    const pagina = comprobar(await crearConsulta().range(desde, desde + tamanoPagina - 1));
-    resultados.push(...pagina);
-    if (pagina.length < tamanoPagina) return resultados;
-  }
 }
 
 export function useCatalogoConteos() {
@@ -21,12 +12,12 @@ export function useCatalogoConteos() {
     queryKey: ['catalogo-conteos'],
     queryFn: async () => {
       const [productos, ubicaciones] = await Promise.all([
-        comprobarTodas(() => supabase.from('productos')
+        consultarTodas(() => supabase.from('productos')
           .select('id,codigo,nombre,tipo,categoria,unidad,piezas_por_caja')
           .eq('activo', true)
           .order('nombre')
           .order('id')),
-        comprobarTodas(() => supabase.from('ubicaciones')
+        consultarTodas(() => supabase.from('ubicaciones')
           .select('id,nombre,tipo')
           .eq('activa', true)
           .order('nombre')
@@ -41,7 +32,7 @@ export function useStockConteo(ubicacionId) {
   return useQuery({
     queryKey: ['conteos', 'stock', ubicacionId],
     enabled: Boolean(ubicacionId),
-    queryFn: () => comprobarTodas(() => supabase
+    queryFn: () => consultarTodas(() => supabase
       .from('v_stock')
       .select('producto_id,fisico')
       .eq('ubicacion_id', ubicacionId)
