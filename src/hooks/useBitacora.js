@@ -88,7 +88,10 @@ export function useDocumentosAnulables() {
 export function useUsuariosBitacora() {
   return useQuery({
     queryKey: ['usuarios-bitacora'],
-    queryFn: async () => comprobar(await supabase.from('usuarios').select('id,nombre').order('nombre')),
+    queryFn: () => consultarTodas(() => supabase.from('usuarios')
+      .select('id,nombre')
+      .order('nombre')
+      .order('id')),
   });
 }
 
