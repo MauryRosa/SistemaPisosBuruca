@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import EmptyState from '../components/ui/EmptyState.jsx';
 import StatusBadge from '../components/ui/StatusBadge.jsx';
-import { useAnularMovimiento, useBitacora, useDocumentosAnulables, useUsuariosBitacora } from '../hooks/useBitacora.js';
+import { useAnularMovimiento, useBitacora, useDocumentosAnulables, useExportarBitacora, useUsuariosBitacora } from '../hooks/useBitacora.js';
 import { valorCSV } from '../lib/csv.js';
 import '../css/bitacora.css';
 
@@ -40,6 +40,14 @@ const NOMBRES_TIPO = {
 
 function serializar(valor) {
   return valor ? JSON.stringify(valor, null, 2) : 'Sin valor';
+}
+
+function buscarFilas(filas, busqueda) {
+  const texto = busqueda.trim().toLocaleLowerCase('es');
+  if (!texto) return filas;
+  return filas.filter((fila) => `${fila.registro_id || ''} ${fila.tabla}`
+    .toLocaleLowerCase('es')
+    .includes(texto));
 }
 
 function exportarBitacora(filas) {
@@ -94,11 +102,10 @@ export default function Bitacora() {
   const bitacora = useBitacora({ desde, hasta, tabla, accion, usuarioId, limite });
   const usuarios = useUsuariosBitacora();
   const anulables = useDocumentosAnulables();
+  const exportacion = useExportarBitacora();
   const anular = useAnularMovimiento();
   const filas = bitacora.data?.filas || SIN_FILAS;
-  const filasVisibles = useMemo(() => filas.filter((fila) => (
-    !busqueda.trim() || `${fila.registro_id || ''} ${fila.tabla}`.toLocaleLowerCase('es').includes(busqueda.trim().toLocaleLowerCase('es'))
-  )), [filas, busqueda]);
+  const filasVisibles = useMemo(() => buscarFilas(filas, busqueda), [filas, busqueda]);
   const documentosAnulables = anulables.data || SIN_FILAS;
   const documentosAnulablesFiltrados = useMemo(() => {
     const texto = busquedaAnulable.trim().toLocaleLowerCase('es-SV');
@@ -119,6 +126,22 @@ export default function Bitacora() {
   function cambiarFiltro(setter, valor) {
     setter(valor);
     setLimite(200);
+  }
+
+  async function exportar() {
+    setMensaje(null);
+    try {
+      const todasLasFilas = await exportacion.mutateAsync({ desde, hasta, tabla, accion, usuarioId });
+      const filasFiltradas = buscarFilas(todasLasFilas, busqueda);
+      if (filasFiltradas.length === 0) {
+        setMensaje({ tipo: 'error', texto: 'No hay eventos que coincidan con la búsqueda para exportar.' });
+        return;
+      }
+      exportarBitacora(filasFiltradas);
+      setMensaje({ tipo: 'exito', texto: `Se exportaron ${filasFiltradas.length} eventos.` });
+    } catch {
+      setMensaje({ tipo: 'error', texto: 'No se pudo exportar la bitácora completa. Inténtalo de nuevo.' });
+    }
   }
 
   async function confirmarAnulacion(event) {
@@ -142,8 +165,8 @@ export default function Bitacora() {
           <h1>Bitácora de auditoría</h1>
           <p>Registro de quién cambió cada dato, cuándo lo hizo y sus valores anteriores y nuevos.</p>
         </div>
-        <button className="btn btn--secondary" type="button" onClick={() => exportarBitacora(filasVisibles)} disabled={!filasVisibles.length}>
-          Exportar CSV
+        <button className="btn btn--secondary" type="button" onClick={exportar} disabled={!bitacora.data?.total || bitacora.isLoading || exportacion.isPending}>
+          {exportacion.isPending ? 'Preparando CSV…' : 'Exportar CSV'}
         </button>
       </header>
 

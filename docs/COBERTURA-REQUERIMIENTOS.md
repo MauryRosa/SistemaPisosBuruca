@@ -48,7 +48,7 @@ La fuente oficial `RequerimientosDeSistema.pdf` fija 41 RF y 17 RNF. `Modelo de 
 | RF-38 | Reporte de salidas por periodo en `Reportes.jsx`. |
 | RF-39 | Kardex, movimientos, mermas y bajo mínimo; el reporte muestra todos los productos por páginas y exporta el conjunto completo a CSV compatible con Excel. |
 | RF-40 | Login, rutas protegidas, menú por rol, RLS y cuentas administradas en `AuthProvider.jsx`, `ProtectedRoute.jsx` y `Usuarios.jsx`. |
-| RF-41 | Triggers registran actor, acción, momento y antes/después; lectura administrativa y sin mutaciones por el rol de aplicación. |
+| RF-41 | Triggers registran actor, acción, momento y antes/después; lectura administrativa, sin mutaciones por el rol de aplicación y exportación CSV de todo el rango y filtros seleccionados. |
 
 **Estado de RF:** los 41 requisitos tienen implementación local identificada. No están aceptados operacionalmente hasta aplicar las migraciones desde cero y recorrer los flujos con usuarios de cada rol.
 
