@@ -149,7 +149,9 @@
   white-space: nowrap;
 }
 
-.badge--pendiente {
+.badge--pendiente,
+.badge--abierta,
+.badge--parcial {
   background: var(--pending-bg);
   color: var(--pending-text);
 }
@@ -161,6 +163,7 @@
 }
 
 .badge--anulado,
+.badge--anulada,
 .badge--rechazado,
 .badge--bajo-minimo,
 .badge--cancelada {
@@ -169,6 +172,7 @@
 }
 
 .badge--inactivo,
+.badge--cerrada,
 .badge--consumida {
   background: var(--neutral-bg);
   color: var(--neutral-text);
