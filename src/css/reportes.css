@@ -35,6 +35,16 @@
   font-size: var(--fs-label);
 }
 
+.reportes__paginacion {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: var(--sp-3);
+  color: var(--text-muted);
+  font-size: var(--fs-label);
+}
+
 .reportes__meta {
   display: block;
   margin-top: var(--sp-1);

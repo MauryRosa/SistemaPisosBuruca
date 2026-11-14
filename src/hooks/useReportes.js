@@ -115,11 +115,11 @@ export function useReporteBajoMinimo(activo = true) {
   return useQuery({
     queryKey: ['reportes', 'bajo-minimo'],
     enabled: activo,
-    queryFn: async () => comprobar(await supabase.from('v_stock_total')
+    queryFn: () => consultarTodas(() => supabase.from('v_stock_total')
       .select('producto_id,codigo,nombre,tipo,categoria,unidad,piezas_por_caja,fisico,reservado,disponible,stock_minimo')
       .eq('bajo_minimo', true)
       .order('disponible')
-      .limit(1000)),
+      .order('producto_id')),
   });
 }
 
