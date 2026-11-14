@@ -67,7 +67,7 @@ La fuente oficial `RequerimientosDeSistema.pdf` fija 41 RF y 17 RNF. `Modelo de 
 | RNF-09 | Pendiente de probar conectividad desde sala de ventas y bodega. |
 | RNF-10 | Auth, RLS, mínimo local de 12 caracteres y JWT de una hora; la marca persistente de actividad sincroniza pestañas y no se reinicia al restaurar o renovar sesión. Falta aplicar y revisar los límites de sesión en el proyecto alojado. |
 | RNF-11 | HTTPS depende del dominio y despliegue final; no verificado. |
-| RNF-12 | Pendiente configurar respaldos diarios y guardar evidencia de una restauración mensual. La organización Supabase actual está en Free; Pro ofrece respaldos diarios de la base con 7 días de retención, pero los objetos de Storage necesitan una copia aparte. |
+| RNF-12 | Pendiente configurar respaldos diarios y guardar evidencia de una restauración mensual. El plan de la cuenta propietaria aún no se verifica; Supabase indica que los respaldos automáticos dependen del plan y no incluyen objetos de Storage, que necesitan una copia aparte. |
 | RNF-13 | Las mutaciones de bitácora están restringidas al rol de aplicación; la retención verificable de cinco años depende de respaldos y política operativa. |
 | RNF-14 | Pendiente revisión real de compañeros en PR. Las autorías no se asignan a personas que no hayan hecho el trabajo. |
 | RNF-15 | Stock, conteos, proveedores, usuarios, catálogos de entradas/pedidos/salidas/traslados/reportes, bajo mínimo, historial de reservas, órdenes, documentos anulables y colas de aprobación recorren resultados y líneas relacionadas por páginas o grupos. Pendiente medir crecimiento y rendimiento con volumen representativo; no hay evidencia para afirmar escalabilidad en producción. |
