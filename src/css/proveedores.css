@@ -1,0 +1,68 @@
+/* Administración de proveedores */
+.proveedores-formulario {
+  overflow: hidden;
+}
+
+.proveedores-formulario__campos {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--sp-4);
+  padding: var(--sp-5);
+}
+
+.proveedores-formulario__acciones {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--sp-3);
+  padding: var(--sp-4) var(--sp-5);
+  border-top: 1px solid var(--border);
+}
+
+.proveedores-filtros {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--sp-3);
+}
+
+.proveedores__resumen {
+  padding: var(--sp-3) var(--sp-4);
+  color: var(--text-muted);
+  font-size: var(--fs-label);
+  border-bottom: 1px solid var(--border);
+}
+
+.proveedores-tabla__acciones {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  align-items: center;
+  gap: var(--sp-2);
+}
+
+.proveedores-tabla__acciones .btn {
+  min-height: 40px;
+  padding: 0 var(--sp-3);
+}
+
+@media (min-width: 768px) {
+  .proveedores-formulario__campos {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .proveedores-filtros {
+    grid-template-columns: minmax(260px, 1fr) minmax(220px, 280px);
+  }
+}
+
+@media (max-width: 767px) {
+  .proveedores-tabla td:first-child {
+    display: block;
+    text-align: left;
+    padding-bottom: var(--sp-2);
+  }
+
+  .proveedores-tabla__acciones {
+    justify-content: flex-start;
+  }
+}
