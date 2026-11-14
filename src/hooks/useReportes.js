@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '../lib/supabase.js';
+import { consultarTodas } from '../lib/consultarTodas.js';
 
 const TIPOS_SALIDA = [
   'salida_venta', 'despacho_minibodega', 'merma', 'consumo_interno',
@@ -35,11 +36,17 @@ export function useCatalogoReportes() {
   return useQuery({
     queryKey: ['catalogo-reportes'],
     queryFn: async () => {
-      const [productosResultado, ubicacionesResultado] = await Promise.all([
-        supabase.from('productos').select('id,codigo,nombre,tipo,categoria,unidad,piezas_por_caja').order('nombre'),
-        supabase.from('ubicaciones').select('id,nombre,tipo').order('nombre'),
+      const [productos, ubicaciones] = await Promise.all([
+        consultarTodas(() => supabase.from('productos')
+          .select('id,codigo,nombre,tipo,categoria,unidad,piezas_por_caja')
+          .order('nombre')
+          .order('id')),
+        consultarTodas(() => supabase.from('ubicaciones')
+          .select('id,nombre,tipo')
+          .order('nombre')
+          .order('id')),
       ]);
-      return { productos: comprobar(productosResultado), ubicaciones: comprobar(ubicacionesResultado) };
+      return { productos, ubicaciones };
     },
   });
 }

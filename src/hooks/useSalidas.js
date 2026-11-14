@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '../lib/supabase.js';
+import { consultarTodas } from '../lib/consultarTodas.js';
 
 function comprobar(resultado) {
   if (resultado.error) throw resultado.error;
@@ -10,19 +11,25 @@ export function useCatalogoSalidas() {
   return useQuery({
     queryKey: ['catalogo-salidas'],
     queryFn: async () => {
-      const [productosResultado, ubicacionesResultado, comprasResultado] = await Promise.all([
-        supabase.from('productos').select('id,codigo,nombre,tipo,unidad,piezas_por_caja,despacho_por').eq('activo', true).order('nombre'),
-        supabase.from('ubicaciones').select('id,nombre,tipo').eq('activa', true).in('tipo', ['bodega', 'minibodega']).order('nombre'),
-        supabase.from('documentos')
+      const [productos, ubicaciones, compras] = await Promise.all([
+        consultarTodas(() => supabase.from('productos')
+          .select('id,codigo,nombre,tipo,unidad,piezas_por_caja,despacho_por')
+          .eq('activo', true)
+          .order('nombre')
+          .order('id')),
+        consultarTodas(() => supabase.from('ubicaciones')
+          .select('id,nombre,tipo')
+          .eq('activa', true)
+          .in('tipo', ['bodega', 'minibodega'])
+          .order('nombre')
+          .order('id')),
+        consultarTodas(() => supabase.from('documentos')
           .select('id,serie,anio,correlativo,fecha,doc_proveedor_numero,orden_pedido_id')
           .eq('tipo', 'entrada_compra')
           .eq('estado', 'aprobado')
           .order('fecha', { ascending: false })
-          .limit(200),
+          .order('id', { ascending: false })),
       ]);
-      const productos = comprobar(productosResultado);
-      const ubicaciones = comprobar(ubicacionesResultado);
-      const compras = comprobar(comprasResultado);
       return {
         productos,
         ubicaciones,
@@ -39,11 +46,12 @@ export function useStockSalida(ubicacionId) {
   return useQuery({
     queryKey: ['salidas', 'stock', ubicacionId],
     enabled: Boolean(ubicacionId),
-    queryFn: async () => comprobar(await supabase
+    queryFn: () => consultarTodas(() => supabase
       .from('v_stock')
       .select('producto_id,codigo,nombre,tipo,unidad,piezas_por_caja,fisico,reservado,disponible')
       .eq('ubicacion_id', ubicacionId)
-      .order('nombre')),
+      .order('nombre')
+      .order('producto_id')),
   });
 }
 

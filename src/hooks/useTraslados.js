@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '../lib/supabase.js';
+import { consultarTodas } from '../lib/consultarTodas.js';
 
 function comprobar(resultado) {
   if (resultado.error) throw resultado.error;
@@ -10,13 +11,22 @@ export function useCatalogoTraslados() {
   return useQuery({
     queryKey: ['catalogo-traslados'],
     queryFn: async () => {
-      const [productosResultado, ubicacionesResultado] = await Promise.all([
-        supabase.from('productos').select('id,codigo,nombre,tipo,unidad,piezas_por_caja').eq('activo', true).order('nombre'),
-        supabase.from('ubicaciones').select('id,nombre,tipo').eq('activa', true).in('tipo', ['bodega', 'minibodega', 'exhibicion']).order('nombre'),
+      const [productos, ubicaciones] = await Promise.all([
+        consultarTodas(() => supabase.from('productos')
+          .select('id,codigo,nombre,tipo,unidad,piezas_por_caja')
+          .eq('activo', true)
+          .order('nombre')
+          .order('id')),
+        consultarTodas(() => supabase.from('ubicaciones')
+          .select('id,nombre,tipo')
+          .eq('activa', true)
+          .in('tipo', ['bodega', 'minibodega', 'exhibicion'])
+          .order('nombre')
+          .order('id')),
       ]);
       return {
-        productos: comprobar(productosResultado),
-        ubicaciones: comprobar(ubicacionesResultado),
+        productos,
+        ubicaciones,
       };
     },
   });
@@ -26,11 +36,12 @@ export function useStockTraslado(ubicacionId) {
   return useQuery({
     queryKey: ['traslado', 'stock', ubicacionId],
     enabled: Boolean(ubicacionId),
-    queryFn: async () => comprobar(await supabase
+    queryFn: () => consultarTodas(() => supabase
       .from('v_stock')
       .select('producto_id,codigo,nombre,tipo,unidad,piezas_por_caja,fisico,reservado,disponible')
       .eq('ubicacion_id', ubicacionId)
-      .order('nombre')),
+      .order('nombre')
+      .order('producto_id')),
   });
 }
 

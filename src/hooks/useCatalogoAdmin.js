@@ -1,23 +1,21 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '../lib/supabase.js';
-
-function comprobar(resultado) {
-  if (resultado.error) throw resultado.error;
-  return resultado.data || [];
-}
+import { consultarTodas } from '../lib/consultarTodas.js';
 
 export function useCatalogoAdmin() {
   return useQuery({
     queryKey: ['catalogo-admin'],
     queryFn: async () => {
-      const [productosResultado, proveedoresResultado] = await Promise.all([
-        supabase.from('productos')
+      const [productos, proveedores] = await Promise.all([
+        consultarTodas(() => supabase.from('productos')
           .select('id,codigo,nombre,tipo,categoria,medida,unidad,piezas_por_caja,despacho_por,stock_minimo,proveedor_id,activo')
-          .order('nombre'),
-        supabase.from('proveedores').select('id,nombre,activo').order('nombre'),
+          .order('nombre')
+          .order('id')),
+        consultarTodas(() => supabase.from('proveedores')
+          .select('id,nombre,activo')
+          .order('nombre')
+          .order('id')),
       ]);
-      const productos = comprobar(productosResultado);
-      const proveedores = comprobar(proveedoresResultado);
       const porProveedor = new Map(proveedores.map((proveedor) => [proveedor.id, proveedor]));
       return {
         productos: productos.map((producto) => ({ ...producto, proveedor: porProveedor.get(producto.proveedor_id) || null })),

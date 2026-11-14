@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '../lib/supabase.js';
+import { consultarTodas } from '../lib/consultarTodas.js';
 
 function comprobar(resultado) {
   if (resultado.error) throw resultado.error;
@@ -10,18 +11,25 @@ export function useCatalogoEntradas() {
   return useQuery({
     queryKey: ['catalogo-entradas'],
     queryFn: async () => {
-      const [productosResultado, ubicacionesResultado, ordenesResultado] = await Promise.all([
-        supabase.from('productos').select('id,codigo,nombre,tipo,unidad,piezas_por_caja').eq('activo', true).order('nombre'),
-        supabase.from('ubicaciones').select('id,nombre').eq('tipo', 'bodega').eq('activa', true).order('nombre'),
-        supabase
+      const [productos, ubicaciones, ordenes] = await Promise.all([
+        consultarTodas(() => supabase.from('productos')
+          .select('id,codigo,nombre,tipo,unidad,piezas_por_caja')
+          .eq('activo', true)
+          .order('nombre')
+          .order('id')),
+        consultarTodas(() => supabase.from('ubicaciones')
+          .select('id,nombre')
+          .eq('tipo', 'bodega')
+          .eq('activa', true)
+          .order('nombre')
+          .order('id')),
+        consultarTodas(() => supabase
           .from('ordenes_pedido')
           .select('id,numero,fecha,fecha_estimada,estado,proveedor_id')
           .in('estado', ['abierta', 'parcial'])
-          .order('fecha', { ascending: false }),
+          .order('fecha', { ascending: false })
+          .order('id', { ascending: false })),
       ]);
-      const productos = comprobar(productosResultado);
-      const ubicaciones = comprobar(ubicacionesResultado);
-      const ordenes = comprobar(ordenesResultado);
       const proveedorIds = [...new Set(ordenes.map((orden) => orden.proveedor_id))];
       const proveedores = proveedorIds.length
         ? comprobar(await supabase.from('proveedores').select('id,nombre').in('id', proveedorIds))

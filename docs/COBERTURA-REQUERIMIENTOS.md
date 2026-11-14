@@ -70,7 +70,7 @@ La fuente oficial `RequerimientosDeSistema.pdf` fija 41 RF y 17 RNF. `Modelo de 
 | RNF-12 | Pendiente configurar respaldos diarios y guardar evidencia de una restauración mensual. |
 | RNF-13 | Las mutaciones de bitácora están restringidas al rol de aplicación; la retención verificable de cinco años depende de respaldos y política operativa. |
 | RNF-14 | Pendiente revisión real de compañeros en PR. Las autorías no se asignan a personas que no hayan hecho el trabajo. |
-| RNF-15 | Stock, conteos, proveedores, catálogos de reservas, historial de reservas y colas de aprobación recorren resultados por páginas para evitar límites fijos de filas. Pendiente medir crecimiento y rendimiento con volumen representativo; no hay evidencia para afirmar escalabilidad en producción. |
+| RNF-15 | Stock, conteos, proveedores, catálogos de entradas/pedidos/salidas/traslados/reportes, historial de reservas y colas de aprobación recorren resultados por páginas para evitar límites fijos de filas. Pendiente medir crecimiento y rendimiento con volumen representativo; no hay evidencia para afirmar escalabilidad en producción. |
 | RNF-16 | CSV implementado; integración con facturación queda fuera del alcance de esta versión. |
 | RNF-17 | Código y dependencias de código abierto; falta elegir proveedor/plan y documentar el costo operativo real. |
 

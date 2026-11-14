@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '../lib/supabase.js';
+import { consultarTodas } from '../lib/consultarTodas.js';
 
 function comprobar(resultado) {
   if (resultado.error) throw resultado.error;
@@ -10,17 +11,22 @@ export function useCatalogosPedido() {
   return useQuery({
     queryKey: ['catalogos-pedidos'],
     queryFn: async () => {
-      const [proveedoresResultado, productosResultado] = await Promise.all([
-        supabase.from('proveedores').select('id,nombre,contacto,telefono,correo').eq('activo', true).order('nombre'),
-        supabase
+      const [proveedores, productos] = await Promise.all([
+        consultarTodas(() => supabase.from('proveedores')
+          .select('id,nombre,contacto,telefono,correo')
+          .eq('activo', true)
+          .order('nombre')
+          .order('id')),
+        consultarTodas(() => supabase
           .from('productos')
           .select('id,codigo,nombre,tipo,unidad,piezas_por_caja,proveedor_id')
           .eq('activo', true)
-          .order('nombre'),
+          .order('nombre')
+          .order('id')),
       ]);
       return {
-        proveedores: comprobar(proveedoresResultado),
-        productos: comprobar(productosResultado),
+        proveedores,
+        productos,
       };
     },
   });
