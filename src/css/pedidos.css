@@ -1,0 +1,269 @@
+.pedidos__formulario {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+  padding: var(--sp-5);
+}
+
+.pedidos__formulario h2,
+.pedidos__lineas-titulo h3,
+.pedidos__tarjeta h2 {
+  margin: 0;
+}
+
+.pedidos__formulario-cabecera p,
+.pedidos__lineas-titulo p,
+.pedidos__ayuda,
+.pedidos__meta {
+  color: var(--text-muted);
+  font-size: var(--fs-label);
+}
+
+.pedidos__formulario-cabecera p {
+  margin-top: var(--sp-1);
+}
+
+.pedidos__datos {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--sp-3);
+}
+
+.pedidos__lineas-formulario {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+}
+
+.pedidos__lineas-titulo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3);
+}
+
+.pedidos__lineas-titulo p {
+  margin-top: var(--sp-1);
+}
+
+.pedidos__linea-formulario {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(100px, 0.7fr);
+  gap: var(--sp-3);
+  padding: var(--sp-3) 0;
+  border-top: 1px solid var(--border);
+}
+
+.pedidos__producto {
+  grid-column: 1 / -1;
+}
+
+.pedidos__cantidad-campo {
+  min-width: 0;
+}
+
+.pedidos__cantidad-resumen {
+  align-self: center;
+  color: var(--text-muted);
+  font-size: var(--fs-label);
+}
+
+.pedidos__cantidad-vacia {
+  min-height: 1px;
+}
+
+.pedidos__quitar-linea {
+  justify-self: end;
+}
+
+.pedidos__acciones-formulario {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.pedidos__filtros {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--sp-3);
+}
+
+.pedidos__lista {
+  display: grid;
+  gap: var(--sp-4);
+}
+
+.pedidos__tarjeta {
+  padding: var(--sp-5);
+}
+
+.pedidos__tarjeta-cabecera {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  padding-bottom: var(--sp-4);
+  border-bottom: 1px solid var(--border);
+}
+
+.pedidos__tarjeta-cabecera h2 {
+  margin: var(--sp-1) 0;
+}
+
+.pedidos__numero {
+  color: var(--primary);
+  font-size: var(--fs-label);
+  font-weight: 700;
+}
+
+.pedidos__detalle {
+  display: grid;
+}
+
+.pedidos__detalle-fila {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  padding: var(--sp-3) 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.pedidos__detalle-fila > div {
+  display: grid;
+  gap: var(--sp-1);
+}
+
+.pedidos__detalle-fila small {
+  color: var(--text-muted);
+}
+
+.pedidos__cantidad {
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.pedidos__cierre {
+  margin-top: var(--sp-3);
+  padding: var(--sp-3) var(--sp-4);
+  background: var(--surface-alt);
+  border-radius: var(--radius);
+  font-size: var(--fs-label);
+}
+
+.pedidos__acciones,
+.pedidos__cerrar-form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--sp-3);
+  margin-top: var(--sp-4);
+}
+
+.pedidos__cerrar-form .field {
+  flex: 1 1 260px;
+}
+
+.pedidos__mensaje {
+  margin: 0;
+  padding: var(--sp-3) var(--sp-4);
+  border-radius: var(--radius);
+  font-size: var(--fs-label);
+}
+
+.pedidos__mensaje--exito {
+  background: var(--success-bg);
+  color: var(--success-text);
+}
+
+.pedidos__mensaje--error {
+  background: var(--danger-bg);
+  color: var(--danger-text);
+}
+
+@media (max-width: 767px) {
+  .pedidos__tarjeta-cabecera {
+    flex-direction: column;
+  }
+
+  .pedidos__detalle-fila {
+    flex-direction: column;
+  }
+
+  .pedidos__cantidad-vacia {
+    display: none;
+  }
+
+  .pedidos__acciones-formulario .btn {
+    width: 100%;
+  }
+}
+
+@media (min-width: 768px) {
+  .pedidos__datos {
+    grid-template-columns: minmax(240px, 1.5fr) minmax(220px, 1fr);
+  }
+
+  .pedidos__linea-formulario {
+    grid-template-columns: minmax(240px, 2fr) repeat(2, minmax(120px, 0.8fr)) auto;
+    align-items: end;
+  }
+
+  .pedidos__producto {
+    grid-column: auto;
+  }
+
+  .pedidos__cantidad-resumen {
+    grid-column: 1 / 4;
+  }
+
+  .pedidos__quitar-linea {
+    grid-column: 4;
+    grid-row: 2;
+  }
+
+  .pedidos__filtros {
+    grid-template-columns: minmax(240px, 1fr) minmax(200px, 320px);
+    align-items: end;
+  }
+}
+
+@media print {
+  @page {
+    margin: 14mm;
+  }
+
+  body * {
+    visibility: hidden !important;
+  }
+
+  .pedidos__tarjeta--imprimir,
+  .pedidos__tarjeta--imprimir * {
+    visibility: visible !important;
+  }
+
+  .pedidos__tarjeta--imprimir {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    box-shadow: none;
+  }
+
+  .pedidos__tarjeta--imprimir button,
+  .pedidos__tarjeta--imprimir form {
+    display: none !important;
+  }
+
+  .pedidos__tarjeta--imprimir .pedidos__tarjeta-cabecera {
+    color: #111;
+  }
+
+  .pedidos__tarjeta--imprimir .pedidos__meta,
+  .pedidos__tarjeta--imprimir .pedidos__numero,
+  .pedidos__tarjeta--imprimir .pedidos__detalle-fila small {
+    color: #333;
+  }
+}

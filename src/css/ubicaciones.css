@@ -1,0 +1,148 @@
+.ubicaciones__encabezado > div {
+  max-width: 720px;
+}
+
+.ubicaciones__resumen {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+  gap: var(--sp-3);
+}
+
+.ubicaciones__dato {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-1);
+  padding: var(--sp-4) var(--sp-5);
+}
+
+.ubicaciones__dato-valor {
+  font-size: var(--fs-stat);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.ubicaciones__dato-etiqueta,
+.ubicaciones__ayuda {
+  font-size: var(--fs-label);
+  color: var(--text-muted);
+}
+
+.ubicaciones__formulario {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+  padding: var(--sp-5);
+}
+
+.ubicaciones__formulario-titulo h2,
+.ubicaciones__tabla-card .card__header h2 {
+  margin: 0;
+}
+
+.ubicaciones__formulario-titulo p {
+  margin-top: var(--sp-1);
+  color: var(--text-muted);
+  font-size: var(--fs-label);
+}
+
+.ubicaciones__campos {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--sp-3);
+}
+
+.ubicaciones__vendible {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-1);
+  justify-content: center;
+  min-height: var(--touch);
+}
+
+.ubicaciones__acciones-formulario {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.ubicaciones__mensaje {
+  margin: 0;
+  padding: var(--sp-3) var(--sp-4);
+  border-radius: var(--radius);
+  font-size: var(--fs-label);
+}
+
+.ubicaciones__mensaje--exito {
+  background: var(--success-bg);
+  color: var(--success-text);
+}
+
+.ubicaciones__mensaje--error {
+  background: var(--danger-bg);
+  color: var(--danger-text);
+}
+
+.ubicaciones__tabla-card {
+  overflow: hidden;
+}
+
+.ubicaciones__tabla-card > .card__header {
+  align-items: flex-start;
+}
+
+.ubicaciones__contador {
+  display: grid;
+  min-width: 32px;
+  min-height: 32px;
+  place-items: center;
+  border-radius: 999px;
+  background: var(--surface-alt);
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+
+.ubicaciones__edicion {
+  display: grid;
+  grid-template-columns: minmax(140px, 1fr) auto auto;
+  align-items: center;
+  gap: var(--sp-2);
+}
+
+.ubicaciones__acciones {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--sp-2);
+}
+
+.ubicaciones__acciones .btn,
+.ubicaciones__edicion .btn {
+  min-height: 40px;
+  padding-inline: var(--sp-3);
+  font-size: var(--fs-label);
+}
+
+@media (max-width: 767px) {
+  .ubicaciones__acciones {
+    flex-basis: 100%;
+  }
+
+  .ubicaciones__tabla td[data-label='Ubicación'] {
+    display: block;
+    text-align: left;
+  }
+
+  .ubicaciones__edicion {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .ubicaciones__edicion .input {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (min-width: 768px) {
+  .ubicaciones__campos {
+    grid-template-columns: minmax(220px, 2fr) minmax(190px, 1fr) minmax(150px, 1fr);
+    align-items: end;
+  }
+}

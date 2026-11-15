@@ -2,6 +2,7 @@
 const TODOS = ['administrador', 'jefe_bodega', 'vendedora'];
 const BODEGA = ['administrador', 'jefe_bodega'];
 const ADMIN = ['administrador'];
+const PEDIDOS = ['administrador', 'vendedora'];
 
 export const MENU = [
   {
@@ -9,7 +10,7 @@ export const MENU = [
     items: [
       { ruta: '/inicio', texto: 'Inicio', icono: 'home', roles: BODEGA },
       { ruta: '/stock', texto: 'Consulta de stock', icono: 'search', roles: TODOS },
-      { ruta: '/pedidos', texto: 'Pedidos a proveedor', icono: 'cart', roles: TODOS },
+      { ruta: '/pedidos', texto: 'Pedidos a proveedor', icono: 'cart', roles: PEDIDOS },
       { ruta: '/entradas', texto: 'Entradas', icono: 'entrada', roles: BODEGA },
       { ruta: '/salidas', texto: 'Salidas', icono: 'salida', roles: BODEGA },
       { ruta: '/traslados', texto: 'Traslados', icono: 'traslado', roles: BODEGA },

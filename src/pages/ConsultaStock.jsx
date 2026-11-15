@@ -1,4 +1,5 @@
 import { useDeferredValue, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useFiltrosStock, useStock, useStockEnVivo } from '../hooks/useStock.js';
 import { formatoStock } from '../lib/unidades.js';
 import Icon from '../components/ui/Icon.jsx';
@@ -142,7 +143,7 @@ export default function ConsultaStock() {
                 {filas.map((f) => (
                   <tr key={`${f.producto_id}-${f.ubicacion_id ?? 'total'}`}>
                     <td>
-                      <p className="producto__nombre">{f.nombre}</p>
+                      <Link className="producto__nombre detalle-stock__enlace" to={`/producto/${f.producto_id}`}>{f.nombre}</Link>
                       <p className="producto__meta">
                         {f.codigo} · {f.categoria}
                         {f.medida ? ` · ${f.medida}` : ''}
