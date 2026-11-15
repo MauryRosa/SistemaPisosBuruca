@@ -1,0 +1,121 @@
+.catalogo {
+  display: grid;
+  gap: var(--sp-4);
+}
+
+.catalogo__formulario {
+  display: grid;
+  gap: var(--sp-4);
+  padding: var(--sp-5);
+}
+
+.catalogo__formulario h2,
+.catalogo__lista h2 {
+  margin: 0;
+}
+
+.catalogo__formulario > div:first-child p,
+.catalogo__lista > header p {
+  margin-top: var(--sp-1);
+  color: var(--text-muted);
+  font-size: var(--fs-label);
+}
+
+.catalogo__campos,
+.catalogo__filtros {
+  display: grid;
+  gap: var(--sp-3);
+}
+
+.catalogo__opcional,
+.catalogo__meta {
+  color: var(--text-muted);
+  font-size: var(--fs-label);
+  font-weight: 400;
+}
+
+.catalogo__meta {
+  display: block;
+  margin-top: var(--sp-1);
+}
+
+.catalogo__acciones {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--sp-2);
+}
+
+.catalogo__lista {
+  display: grid;
+  gap: var(--sp-3);
+}
+
+.catalogo__lista > header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3);
+}
+
+.catalogo__filtros {
+  padding: var(--sp-4);
+}
+
+.catalogo__tabla {
+  padding: var(--sp-2);
+}
+
+.catalogo__fila-acciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+}
+
+.catalogo .btn {
+  min-height: var(--touch);
+}
+
+.catalogo__mensaje {
+  margin: 0;
+  padding: var(--sp-3) var(--sp-4);
+  border-radius: var(--radius);
+  font-size: var(--fs-label);
+}
+
+.catalogo__mensaje--exito {
+  background: var(--success-bg);
+  color: var(--success-text);
+}
+
+.catalogo__mensaje--error {
+  background: var(--danger-bg);
+  color: var(--danger-text);
+}
+
+@media (min-width: 768px) {
+  .catalogo__campos {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .catalogo__filtros {
+    grid-template-columns: minmax(280px, 1fr) minmax(180px, .4fr);
+    align-items: end;
+  }
+}
+
+@media (max-width: 767px) {
+  .catalogo__acciones,
+  .catalogo__acciones .btn {
+    width: 100%;
+  }
+
+  .catalogo__fila-acciones {
+    width: 100%;
+  }
+
+  .catalogo__fila-acciones .btn {
+    flex: 1;
+  }
+}
