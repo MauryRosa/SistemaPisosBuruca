@@ -48,16 +48,16 @@ export function useFiltrosStock() {
   });
 }
 
-// Tiempo real (RNF-04): cualquier cambio en existencias o reservas refresca la consulta
+// Tiempo real (RNF-04): las reservas solo notifican una invalidación sin filas.
 export function useStockEnVivo() {
   const queryClient = useQueryClient();
   useEffect(() => {
     const canal = supabase
-      .channel('stock-en-vivo')
+      .channel('stock:invalidacion', { config: { private: true } })
       .on('postgres_changes', { event: '*', schema: 'public', table: 'existencias' }, () =>
         queryClient.invalidateQueries({ queryKey: ['stock'] }),
       )
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'reservas' }, () =>
+      .on('broadcast', { event: 'stock_invalidado' }, () =>
         queryClient.invalidateQueries({ queryKey: ['stock'] }),
       )
       .subscribe();

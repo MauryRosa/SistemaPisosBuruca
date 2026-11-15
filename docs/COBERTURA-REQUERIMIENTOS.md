@@ -16,7 +16,7 @@ Contraste de la matriz `Vault_Pisos_Buruca/03 Requerimientos` con el código de 
 | RF-08 | Altas de ubicaciones configurables en `Ubicaciones.jsx` y `useUbicaciones.js`. |
 | RF-09 | Creación y cierre de órdenes por administración y ventas en `Pedidos.jsx`; correlativos y validación transaccional en `20261114105835_pedidos_con_correlativo.sql`. |
 | RF-10 | Recepción ligada a la orden y al número de factura o remisión en `Entradas.jsx` y `registrar_movimiento_core`. |
-| RF-11 | Cantidades solicitadas/recibidas, faltantes, sobrantes y observaciones en `Entradas.jsx`; acumulados validados en base de datos. |
+| RF-11 | Cantidades solicitadas/recibidas, faltantes, sobrantes y observaciones en `Entradas.jsx`; la base exige observación al exceder la orden (`20261114124108_require_observation_for_purchase_overage.sql`). |
 | RF-12 | Captura de cajas y piezas convertida a unidad base en `Entradas.jsx` y `src/lib/unidades.js`. |
 | RF-13 | Devolución ligada a una venta y cambio/garantía en `Entradas.jsx`; origen y cantidades acumuladas validados en `20261114105813_validar_devolucion_cliente.sql`. |
 | RF-14 | Registro de inventario inicial por ubicación en `Entradas.jsx` y RPC transaccional. |
@@ -32,7 +32,7 @@ Contraste de la matriz `Vault_Pisos_Buruca/03 Requerimientos` con el código de 
 | RF-24 | Cambio captura devolución y reemplazo dentro de una sola llamada transaccional. |
 | RF-25 | Anulación con motivo y movimiento inverso; casos no reversibles se bloquean en `20261114105810_anulaciones_y_apertura_caja.sql`. |
 | RF-26 | Jefatura de bodega crea reservas para una vendedora en `Reservas.jsx`. |
-| RF-27 | La vista de stock calcula disponible como físico menos reservas activas. |
+| RF-27 | La vista de stock calcula disponible como físico menos reservas activas; `v_reservas_stock_activas` entrega solo totales a perfiles activos y mantiene privadas las filas de reservas. |
 | RF-28 | Despacho consume la reserva coincidente; cancelación requiere motivo. |
 | RF-29 | Correlativos de servidor por serie/año, iniciados en 00001, mediante `correlativos`. |
 | RF-30 | Nombre de quien retira, placa obligatoria (`Salidas.jsx` y `20261114105837_requerir_placa_en_despachos.sql`) y firma/foto privada; el comprobante se puede imprimir. |
@@ -41,7 +41,7 @@ Contraste de la matriz `Vault_Pisos_Buruca/03 Requerimientos` con el código de 
 | RF-33 | Captura de cajas+piezas para pisos y unidad simple para accesorios en formularios de movimientos. |
 | RF-34 | Persistencia en piezas/unidades base y presentación como cajas+piezas en `src/lib/unidades.js`; la interfaz no muestra m². |
 | RF-35 | Apertura de caja se registra como documento trazable sin modificar existencias. |
-| RF-36 | Físico, reservado y disponible por ubicación en `ConsultaStock.jsx`; Realtime invalida la consulta. |
+| RF-36 | Físico, reservado y disponible por ubicación en `ConsultaStock.jsx`; cambios de reservas envían una invalidación privada sin exponer sus filas. |
 | RF-37 | Conteos totales o por categoría; ajustes en documentos atómicos con aprobación administrativa en `Conteos.jsx`. |
 | RF-38 | Reporte de salidas por periodo en `Reportes.jsx`. |
 | RF-39 | Kardex, movimientos, mermas y bajo mínimo; exportación CSV compatible con Excel. |
@@ -57,13 +57,13 @@ Contraste de la matriz `Vault_Pisos_Buruca/03 Requerimientos` con el código de 
 | RNF-01 | Los roles de aplicación no borran documentos ni bitácora; se corrige con anulaciones o ajustes. Requiere comprobar en PostgreSQL. |
 | RNF-02 | Restricción no negativa y bloqueos de filas en las operaciones de stock. Requiere probar concurrencia en PostgreSQL. |
 | RNF-03 | RPC transaccionales para movimientos, reservas, conteos, pedidos y anulaciones. Aplicación de migraciones pendiente. |
-| RNF-04 | Realtime configurado para existencias y reservas; falta medir el límite de cinco segundos en el entorno alojado. |
+| RNF-04 | Realtime actualiza existencias por cambios de PostgreSQL y reservas mediante Broadcast privado para perfiles activos; falta medir el límite de cinco segundos en el entorno alojado. |
 | RNF-05 | Pendiente: medir menos de dos segundos con seis usuarios y datos representativos. |
 | RNF-06 | Flujos en español y formularios directos; falta cronometrar una salida con personal de bodega y confirmar el límite de tres pantallas. |
 | RNF-07 | CSS adaptable, búsqueda por código/nombre y objetivos táctiles de 48 px; falta revisar en PC, celular y tablet reales. |
 | RNF-08 | Pendiente de un despliegue y medición de disponibilidad durante horario de operación. |
 | RNF-09 | Pendiente de probar conectividad desde sala de ventas y bodega. |
-| RNF-10 | Auth, RLS, mínimo local de 12 caracteres, JWT de una hora y cierre por inactividad configurados en el repositorio; falta aplicar y revisar los mismos límites en el proyecto alojado. |
+| RNF-10 | Auth, RLS, mínimo local de 12 caracteres y JWT de una hora; la marca persistente de actividad sincroniza pestañas y no se reinicia al restaurar o renovar sesión. Falta aplicar y revisar los límites de sesión en el proyecto alojado. |
 | RNF-11 | HTTPS depende del dominio y despliegue final; no verificado. |
 | RNF-12 | Pendiente configurar respaldos diarios y guardar evidencia de una restauración mensual. |
 | RNF-13 | Las mutaciones de bitácora están restringidas al rol de aplicación; la retención verificable de cinco años depende de respaldos y política operativa. |
