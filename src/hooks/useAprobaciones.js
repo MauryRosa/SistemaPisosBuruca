@@ -1,15 +1,19 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '../lib/supabase.js';
-import { consultarPorIds, consultarTodas } from '../lib/consultarTodas.js';
+import { consultarPorIds } from '../lib/consultarTodas.js';
 
-async function consultarAprobaciones() {
-  const documentos = await consultarTodas(() => supabase
+async function consultarAprobaciones(pagina, tamanoPagina) {
+  const desde = pagina * tamanoPagina;
+  const hasta = desde + tamanoPagina - 1;
+  const { data: documentos, error: errorDocumentos, count } = await supabase
     .from('documentos')
-    .select('id,tipo,serie,anio,correlativo,fecha,motivo,es_contingencia,evidencia_url,doc_venta_tipo,doc_venta_numero,doc_proveedor_numero,creado_por,orden_pedido_id')
+    .select('id,tipo,serie,anio,correlativo,fecha,motivo,es_contingencia,evidencia_url,doc_venta_tipo,doc_venta_numero,doc_proveedor_numero,creado_por,orden_pedido_id', { count: 'exact' })
     .eq('estado', 'pendiente')
     .order('fecha', { ascending: true })
-    .order('id', { ascending: true }));
-  if (documentos.length === 0) return [];
+    .order('id', { ascending: true })
+    .range(desde, hasta);
+  if (errorDocumentos) throw errorDocumentos;
+  if (documentos.length === 0) return { items: [], total: count || 0 };
 
   const documentoIds = documentos.map((documento) => documento.id);
   const usuarioIds = [...new Set(documentos.map((documento) => documento.creado_por).filter(Boolean))];
@@ -68,17 +72,23 @@ async function consultarAprobaciones() {
     lineasPorDocumento.set(linea.documento_id, grupo);
   }
 
-  return documentos.map((documento) => ({
-    ...documento,
-    numero: `${documento.serie}-${documento.anio}-${String(documento.correlativo).padStart(5, '0')}`,
-    creador: porUsuario.get(documento.creado_por) || 'Usuario no disponible',
-    evidencia_enlace: porEvidencia.get(documento.id) || null,
-    lineas: lineasPorDocumento.get(documento.id) || [],
-  }));
+  return {
+    items: documentos.map((documento) => ({
+      ...documento,
+      numero: `${documento.serie}-${documento.anio}-${String(documento.correlativo).padStart(5, '0')}`,
+      creador: porUsuario.get(documento.creado_por) || 'Usuario no disponible',
+      evidencia_enlace: porEvidencia.get(documento.id) || null,
+      lineas: lineasPorDocumento.get(documento.id) || [],
+    })),
+    total: count || 0,
+  };
 }
 
-export function useAprobaciones() {
-  return useQuery({ queryKey: ['aprobaciones'], queryFn: consultarAprobaciones });
+export function useAprobaciones(pagina = 0, tamanoPagina = 15) {
+  return useQuery({
+    queryKey: ['aprobaciones', pagina, tamanoPagina],
+    queryFn: () => consultarAprobaciones(pagina, tamanoPagina),
+  });
 }
 
 function useAccionAprobacion(nombreFuncion) {

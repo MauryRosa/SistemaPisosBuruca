@@ -41,7 +41,7 @@ La fuente oficial `RequerimientosDeSistema.pdf` fija 41 RF y 17 RNF. `Modelo de 
 | RF-31 | Vista de comprobante de salida preparada para imprimir o guardar como PDF desde el navegador; recupera todas las líneas y consulta productos y ubicaciones por lotes. |
 | RF-32 | Despacho desde minibodega en formulario y RPC, que valida el tipo de ubicación. |
 | RF-33 | Captura de cajas+piezas para pisos y unidad simple para accesorios en formularios de movimientos. |
-| RF-34 | Persistencia en piezas/unidades base y presentación como cajas+piezas en `src/lib/unidades.js`; la interfaz no muestra m². |
+| RF-34 | Persistencia en piezas/unidades base; muestra cajas completas y piezas totales, por ejemplo «10 cajas de 2 + 1 suelta: Cajas 10 · Piezas 21» (`src/lib/unidades.js`). La interfaz no muestra m². |
 | RF-35 | Apertura de caja se registra como documento trazable sin modificar existencias. |
 | RF-36 | Físico, reservado y disponible por ubicación en `ConsultaStock.jsx`; cambios de reservas envían una invalidación privada sin exponer sus filas. |
 | RF-37 | Conteos totales o por categoría; catálogo y stock se cargan por páginas, y todos los conteos pendientes se recuperan para aprobación administrativa como documentos atómicos. El historial conserva los 100 más recientes. |
@@ -67,22 +67,24 @@ La fuente oficial `RequerimientosDeSistema.pdf` fija 41 RF y 17 RNF. `Modelo de 
 | RNF-09 | Pendiente de probar conectividad desde sala de ventas y bodega. |
 | RNF-10 | Auth, RLS, mínimo local de 12 caracteres y JWT de una hora; la marca persistente de actividad sincroniza pestañas y no se reinicia al restaurar o renovar sesión. Falta aplicar y revisar los límites de sesión en el proyecto alojado. |
 | RNF-11 | HTTPS depende del dominio y despliegue final; no verificado. |
-| RNF-12 | Pendiente configurar respaldos diarios y guardar evidencia de una restauración mensual. |
+| RNF-12 | Pendiente configurar respaldos diarios y guardar evidencia de una restauración mensual. El plan de la cuenta propietaria aún no se verifica; Supabase indica que los respaldos automáticos dependen del plan y no incluyen objetos de Storage, que necesitan una copia aparte. |
 | RNF-13 | Las mutaciones de bitácora están restringidas al rol de aplicación; la retención verificable de cinco años depende de respaldos y política operativa. |
 | RNF-14 | Pendiente revisión real de compañeros en PR. Las autorías no se asignan a personas que no hayan hecho el trabajo. |
 | RNF-15 | Stock, conteos, proveedores, usuarios, catálogos de entradas/pedidos/salidas/traslados/reportes, bajo mínimo, historial de reservas, órdenes, documentos anulables y colas de aprobación recorren resultados y líneas relacionadas por páginas o grupos. Pendiente medir crecimiento y rendimiento con volumen representativo; no hay evidencia para afirmar escalabilidad en producción. |
 | RNF-16 | CSV implementado; integración con facturación queda fuera del alcance de esta versión. |
-| RNF-17 | Código y dependencias de código abierto; falta elegir proveedor/plan y documentar el costo operativo real. |
+| RNF-17 | Código y dependencias de código abierto; falta confirmar y documentar el costo operativo de la organización que aloja el proyecto. La cuenta Supabase conectada usa Free y tiene dos proyectos activos; el usuario indica que Pisos Buruca está en otra cuenta, cuyo plan y costo todavía no se verifican. |
 
 ## Verificación realizada
 
+- Comparación estática de trazabilidad: la matriz incluye los 41 RF del PDF oficial y los 17 RNF de la bóveda, sin códigos omitidos; las 15 rutas del menú tienen una pantalla asignada. Esta comprobación confirma referencias, no la ejecución funcional de cada flujo.
 - `npm run lint`: correcto.
 - `npm run build`: correcto; Vite transformó 223 módulos.
 - `git diff --check`: correcto.
-- No se ejecutó la suite automatizada ni una base PostgreSQL: `supabase status` no pudo inspeccionar Podman porque no puede ajustar `/run/user/1000/libpod` (`read-only file system`).
-- La lista de proyectos Supabase consultada el 14/11/2026 mostró `SIA-U` y `UNIVO-Sistema-Contable`, sin proyecto Pisos Buruca. La primera consulta falló y el reintento recuperó la lista. No se aplicaron migraciones ni se desplegó Edge Function.
+- `npm test`: 5 pruebas unitarias de `src/lib/unidades.test.js` pasaron. No se ejecutaron pruebas de PostgreSQL: no había una base local disponible (`127.0.0.1:54322` rechazó la conexión), así que las migraciones y los flujos de datos siguen sin validación de runtime.
+- La cuenta Supabase conectada consultada el 14/11/2026 muestra la organización Gnd Code en Free, con SIA-U y UNIVO-Sistema-Contable; Pisos Buruca no aparece en esa cuenta. El usuario indica que el proyecto está en otra cuenta, cuyo acceso y estado no se han verificado. La cotización de USD 0 y el límite de dos proyectos aplican solo a crear otro proyecto en Gnd Code.
+- La cuenta Vercel conectada no muestra un proyecto ni despliegues de Pisos Buruca; no se verificaron otras cuentas.
 - La rama integrada sigue local y no se publicó en GitHub.
-- `variablesDB.txt` está en el directorio padre del repositorio, con permisos `0600`, y no forma parte de Git; no se leyó su contenido. Los archivos `.env` están ignorados.
+- variablesDB.txt está en el directorio padre del repositorio, con permisos 0600, y no forma parte de Git; no se leyó su contenido. El archivo .env local tiene permisos 0600 y está ignorado por Git; su clave no se abrió ni se registró.
 
 ## Criterio de cierre
 

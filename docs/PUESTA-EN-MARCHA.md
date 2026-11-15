@@ -41,3 +41,11 @@ Referencias: [Auth sessions](https://supabase.com/docs/guides/auth/sessions), [d
 - [ ] Obtener revisión real de otro integrante en GitHub antes de cerrar los PR.
 
 `npm run lint` y `npm run build` pasan en la rama actual. Las casillas anteriores aún requieren una instancia Supabase accesible, un despliegue y revisión del equipo.
+
+## Estado de Supabase consultado el 14/11/2026
+
+- La cuenta Supabase conectada muestra la organización Gnd Code en Free, con dos proyectos activos (SIA-U y UNIVO-Sistema-Contable); Pisos Buruca no aparece en esa cuenta. El usuario indica que el proyecto existente está en otra cuenta, cuyo acceso y configuración aún no se verifican.
+- La cotización de USD 0/mes aplica a crear un proyecto en Gnd Code; la organización ya alcanzó su límite Free de dos proyectos activos. Este dato no determina el costo ni el plan del proyecto que está en otra cuenta.
+- La copia local revisada apunta VITE_SUPABASE_URL a 127.0.0.1; esa dirección corresponde al entorno local y no identifica el proyecto alojado. No se inspeccionaron claves del archivo .env.
+- Pro cuesta USD 25/mes e incluye créditos para una instancia Micro y respaldos diarios de base de datos con siete días de retención. Los respaldos de base de datos no incluyen objetos de Storage; la evidencia de movimientos requiere un respaldo separado. Confirma el costo final de la organización antes de cambiar el plan o crear el proyecto.
+- Fuentes: [precios de Supabase](https://supabase.com/pricing), [respaldos de base de datos](https://supabase.com/docs/guides/platform/backups).
