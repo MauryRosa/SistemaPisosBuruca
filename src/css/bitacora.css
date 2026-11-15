@@ -1,0 +1,152 @@
+.bitacora {
+  display: grid;
+  gap: var(--sp-4);
+}
+
+.bitacora__filtros {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--sp-3);
+  padding: var(--sp-4);
+}
+
+.bitacora__tabla {
+  display: grid;
+  gap: var(--sp-3);
+  padding: var(--sp-4);
+}
+
+.bitacora__tabla > header,
+.bitacora__anulaciones > header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3);
+}
+
+.bitacora__tabla > header h2,
+.bitacora__anulaciones > header h2 {
+  margin: 0;
+}
+
+.bitacora__tabla > header span,
+.bitacora__anulaciones > header p {
+  color: var(--text-muted);
+  font-size: var(--fs-label);
+}
+
+.bitacora__detalle summary {
+  color: var(--primary);
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.bitacora__detalle > div {
+  display: grid;
+  gap: var(--sp-3);
+  max-width: min(80vw, 720px);
+  padding: var(--sp-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface-alt);
+}
+
+.bitacora__detalle h3 {
+  margin: 0 0 var(--sp-1);
+  font-size: var(--fs-label);
+}
+
+.bitacora__detalle pre {
+  max-height: 280px;
+  margin: 0;
+  overflow: auto;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font-size: 12px;
+}
+
+.bitacora__anulaciones {
+  display: grid;
+  gap: var(--sp-3);
+}
+
+.bitacora__anulaciones > header h2 {
+  margin-bottom: var(--sp-1);
+}
+
+.bitacora__anulaciones > header p {
+  margin: 0;
+}
+
+.bitacora__anulables {
+  display: grid;
+  gap: var(--sp-3);
+}
+
+.bitacora__anulable {
+  display: grid;
+  gap: var(--sp-3);
+  padding: var(--sp-4);
+}
+
+.bitacora__anulable p,
+.bitacora__anulable small {
+  display: block;
+  margin: var(--sp-1) 0 0;
+  color: var(--text-muted);
+  font-size: var(--fs-label);
+}
+
+.bitacora__anulable .bitacora__bloqueo {
+  color: var(--pending-text);
+}
+
+.bitacora__anulable form {
+  display: grid;
+  gap: var(--sp-2);
+}
+
+.bitacora__mensaje {
+  margin: 0;
+  padding: var(--sp-3) var(--sp-4);
+  border-radius: var(--radius);
+  font-size: var(--fs-label);
+}
+
+.bitacora__mensaje--exito {
+  background: var(--success-bg);
+  color: var(--success-text);
+}
+
+.bitacora__mensaje--error {
+  background: var(--danger-bg);
+  color: var(--danger-text);
+}
+
+@media (min-width: 768px) {
+  .bitacora__filtros {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .bitacora__anulable {
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+  }
+
+  .bitacora__anulable form {
+    grid-template-columns: minmax(200px, 1fr) auto auto;
+    align-items: end;
+  }
+}
+
+@media (max-width: 767px) {
+  .bitacora__tabla > .tabla-scroll .table td {
+    overflow-wrap: anywhere;
+  }
+
+  .bitacora__anulable > .btn,
+  .bitacora__anulable form .btn {
+    width: 100%;
+  }
+}
