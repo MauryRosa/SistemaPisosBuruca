@@ -9,6 +9,10 @@
    - Cuentas locales: `admin`, `bodega` y `vendedora1`; contraseña de demostración: `DemoPisos2026!`. No reutilices esa contraseña fuera del entorno local.
 5. Instala dependencias y ejecuta `pnpm dev`.
 
+Nota sobre el inicio de sesión local: en `supabase/config.toml`, `[auth.email] enable_signup` debe ser `true` (activa el proveedor de correo, necesario para ingresar con usuario y contraseña) y `[auth] enable_signup` debe seguir en `false` (bloquea los registros nuevos: un `signup` externo responde `signup_disabled`). Con `[auth.email] enable_signup = false` nadie puede iniciar sesión, ni siquiera las cuentas administradas.
+
+La función `admin-usuarios` acepta `ALLOWED_ORIGIN` (en `supabase/functions/.env` o como secreto) para restringir CORS al origen de la aplicación; sin definirlo se mantiene `*`, protegido por el token Bearer.
+
 La clave `service_role` solo se configura como secreto del entorno de Supabase. No se coloca en `.env` del frontend.
 
 ## Entorno alojado
