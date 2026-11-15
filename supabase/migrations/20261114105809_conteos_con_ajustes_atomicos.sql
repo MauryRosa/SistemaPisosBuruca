@@ -93,6 +93,12 @@ begin
     raise exception 'La ubicacion no existe o esta inactiva.';
   end if;
 
+  perform 1
+  from public.productos p
+  where p.activo and (p_alcance = 'total' or p.categoria = v_categoria)
+  order by p.id
+  for share;
+
   select count(*)::integer into v_esperados
   from public.productos p
   where p.activo and (p_alcance = 'total' or p.categoria = v_categoria);

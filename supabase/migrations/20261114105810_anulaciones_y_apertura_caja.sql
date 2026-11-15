@@ -49,6 +49,21 @@ begin
     raise exception 'Anule las devoluciones al proveedor vinculadas antes de anular la recepcion.';
   end if;
 
+  perform 1
+  from public.productos p
+  join public.detalle_documento dd on dd.producto_id = p.id
+  where dd.documento_id = v_original.id
+  order by p.id
+  for share of p;
+  if exists (
+    select 1
+    from public.productos p
+    join public.detalle_documento dd on dd.producto_id = p.id
+    where dd.documento_id = v_original.id and not p.activo
+  ) then
+    raise exception 'Reactive los productos del movimiento antes de anularlo.';
+  end if;
+
   perform 1 from public.correlativos c where c.serie = v_serie and c.anio = v_anio for update;
   insert into public.correlativos (serie, anio, ultimo_numero)
   values (v_serie, v_anio, 1)
@@ -208,7 +223,9 @@ begin
     v_producto_id := nullif(v_linea ->> 'producto_id', '')::bigint;
     v_cajas := nullif(v_linea ->> 'cantidad_cajas', '')::integer;
     select p.piezas_por_caja into v_piezas_por_caja
-    from public.productos p where p.id = v_producto_id and p.activo and p.tipo = 'piso';
+    from public.productos p
+    where p.id = v_producto_id and p.activo and p.tipo = 'piso'
+    for share;
     if v_piezas_por_caja is null or v_cajas is null or v_cajas <= 0 then
       raise exception 'Seleccione un piso activo y una cantidad positiva de cajas.';
     end if;
