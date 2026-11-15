@@ -19,3 +19,6 @@ Thumbs.db
 .vscode/*
 !.vscode/extensions.json
 *.log
+
+# Almacén local de pnpm (base binaria SQLite, no versionar)
+.pnpm-store/
