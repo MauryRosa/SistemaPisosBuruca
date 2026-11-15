@@ -13,13 +13,15 @@ export default function ConsultaStock() {
   const [ubicacionId, setUbicacionId] = useState('');
   const [categoria, setCategoria] = useState('');
   const [soloBajoMinimo, setSoloBajoMinimo] = useState(false);
+  const [pagina, setPagina] = useState(0);
   const busquedaDiferida = useDeferredValue(busqueda);
 
   useStockEnVivo();
   const { data: filtros } = useFiltrosStock();
   const {
-    data: filas = [],
+    data: resultado = {},
     isLoading,
+    isFetching,
     isError,
     refetch,
     dataUpdatedAt,
@@ -28,7 +30,9 @@ export default function ConsultaStock() {
     ubicacionId: ubicacionId ? Number(ubicacionId) : null,
     categoria,
     soloBajoMinimo,
+    pagina,
   });
+  const { filas = [], haySiguiente = false } = resultado;
 
   const porUbicacion = Boolean(ubicacionId);
   const hora = dataUpdatedAt
@@ -53,7 +57,10 @@ export default function ConsultaStock() {
             type="search"
             placeholder="Buscar por código o nombre"
             value={busqueda}
-            onChange={(e) => setBusqueda(e.target.value)}
+            onChange={(e) => {
+              setBusqueda(e.target.value);
+              setPagina(0);
+            }}
           />
         </label>
         <div className="filtros__fila">
@@ -62,7 +69,10 @@ export default function ConsultaStock() {
             <select
               className="input"
               value={ubicacionId}
-              onChange={(e) => setUbicacionId(e.target.value)}
+              onChange={(e) => {
+                setUbicacionId(e.target.value);
+                setPagina(0);
+              }}
             >
               <option value="">Todas las ubicaciones</option>
               {filtros?.ubicaciones.map((u) => (
@@ -77,7 +87,10 @@ export default function ConsultaStock() {
             <select
               className="input"
               value={categoria}
-              onChange={(e) => setCategoria(e.target.value)}
+              onChange={(e) => {
+                setCategoria(e.target.value);
+                setPagina(0);
+              }}
             >
               <option value="">Todas las categorías</option>
               {filtros?.categorias.map((c) => (
@@ -93,7 +106,10 @@ export default function ConsultaStock() {
             type="checkbox"
             checked={soloBajoMinimo}
             disabled={porUbicacion}
-            onChange={(e) => setSoloBajoMinimo(e.target.checked)}
+            onChange={(e) => {
+              setSoloBajoMinimo(e.target.checked);
+              setPagina(0);
+            }}
           />
           Solo bajo mínimo
         </label>
@@ -104,7 +120,7 @@ export default function ConsultaStock() {
           <span>
             {isLoading
               ? 'Consultando…'
-              : `${filas.length} producto${filas.length === 1 ? '' : 's'}`}
+              : `Mostrando ${filas.length} producto${filas.length === 1 ? '' : 's'} · página ${pagina + 1}`}
             {porUbicacion ? '' : ' · total de bodega principal y minibodega'}
           </span>
           {hora && <span className="stock__vivo">Actualizado {hora} · en tiempo real</span>}
@@ -127,52 +143,74 @@ export default function ConsultaStock() {
         {!isLoading && !isError && filas.length > 0 && (
           <div className="tabla-scroll">
             <table className="table table--stack stock-tabla">
-              <thead>
-                <tr>
-                  <th scope="col">Producto</th>
-                  {porUbicacion && <th scope="col">Ubicación</th>}
-                  <th scope="col">Físico</th>
-                  <th scope="col">Reservado</th>
-                  <th scope="col">Disponible</th>
-                  <th scope="col">
-                    <span className="sr-only">Estado</span>
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {filas.map((f) => (
-                  <tr key={`${f.producto_id}-${f.ubicacion_id ?? 'total'}`}>
-                    <td>
-                      <Link className="producto__nombre detalle-stock__enlace" to={`/producto/${f.producto_id}`}>{f.nombre}</Link>
-                      <p className="producto__meta">
-                        {f.codigo} · {f.categoria}
-                        {f.medida ? ` · ${f.medida}` : ''}
-                      </p>
-                      {!porUbicacion && f.en_exhibicion > 0 && (
-                        <p className="producto__meta">
-                          En exhibición: {formatoStock(f.en_exhibicion, f)}
-                        </p>
-                      )}
-                    </td>
-                    {porUbicacion && <td data-label="Ubicación">{f.ubicacion}</td>}
-                    <td data-label="Físico" className="cantidad">
-                      {formatoStock(f.fisico, f)}
-                    </td>
-                    <td data-label="Reservado" className="cantidad">
-                      {formatoStock(f.reservado, f)}
-                    </td>
-                    <td
-                      data-label="Disponible"
-                      className={`cantidad cantidad--disponible${f.disponible === 0 ? ' cantidad--cero' : ''}`}
-                    >
-                      {formatoStock(f.disponible, f)}
-                    </td>
-                    <td data-label="">{f.bajo_minimo && <StatusBadge estado="bajo-minimo" />}</td>
+                <thead>
+                  <tr>
+                    <th scope="col">Producto</th>
+                    {porUbicacion && <th scope="col">Ubicación</th>}
+                    <th scope="col">Físico</th>
+                    <th scope="col">Reservado</th>
+                    <th scope="col">Disponible</th>
+                    <th scope="col">
+                      <span className="sr-only">Estado</span>
+                    </th>
                   </tr>
-                ))}
-              </tbody>
+                </thead>
+                <tbody>
+                  {filas.map((f) => (
+                    <tr key={`${f.producto_id}-${f.ubicacion_id ?? 'total'}`}>
+                      <td>
+                        <Link className="producto__nombre detalle-stock__enlace" to={`/producto/${f.producto_id}`}>{f.nombre}</Link>
+                        <p className="producto__meta">
+                          {f.codigo} · {f.categoria}
+                          {f.medida ? ` · ${f.medida}` : ''}
+                        </p>
+                        {!porUbicacion && f.en_exhibicion > 0 && (
+                          <p className="producto__meta">
+                            En exhibición: {formatoStock(f.en_exhibicion, f)}
+                          </p>
+                        )}
+                      </td>
+                      {porUbicacion && <td data-label="Ubicación">{f.ubicacion}</td>}
+                      <td data-label="Físico" className="cantidad">
+                        {formatoStock(f.fisico, f)}
+                      </td>
+                      <td data-label="Reservado" className="cantidad">
+                        {formatoStock(f.reservado, f)}
+                      </td>
+                      <td
+                        data-label="Disponible"
+                        className={`cantidad cantidad--disponible${f.disponible === 0 ? ' cantidad--cero' : ''}`}
+                      >
+                        {formatoStock(f.disponible, f)}
+                      </td>
+                      <td data-label="">{f.bajo_minimo && <StatusBadge estado="bajo-minimo" />}</td>
+                    </tr>
+                  ))}
+                </tbody>
             </table>
           </div>
+        )}
+
+        {!isLoading && !isError && (pagina > 0 || filas.length > 0) && (
+          <nav className="stock__paginacion" aria-label="Paginación de productos">
+            <button
+              type="button"
+              className="btn btn--secondary"
+              onClick={() => setPagina((actual) => Math.max(0, actual - 1))}
+              disabled={pagina === 0 || isFetching}
+            >
+              Anterior
+            </button>
+            <span aria-live="polite">Página {pagina + 1}</span>
+            <button
+              type="button"
+              className="btn btn--secondary"
+              onClick={() => setPagina((actual) => actual + 1)}
+              disabled={!haySiguiente || isFetching}
+            >
+              Siguiente
+            </button>
+          </nav>
         )}
       </div>
     </section>
