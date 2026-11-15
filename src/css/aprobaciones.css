@@ -3,6 +3,16 @@
   gap: var(--sp-4);
 }
 
+.aprobaciones__paginacion {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: var(--sp-3);
+  color: var(--text-muted);
+  font-size: var(--fs-label);
+}
+
 .aprobaciones__contadores {
   display: flex;
   flex-wrap: wrap;

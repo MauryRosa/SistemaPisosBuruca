@@ -1,24 +1,33 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '../lib/supabase.js';
-
-function comprobar(resultado) {
-  if (resultado.error) throw resultado.error;
-  return resultado.data || [];
-}
+import { consultarPorIds, consultarTodas } from '../lib/consultarTodas.js';
 
 export function useCatalogoReservas() {
   return useQuery({
     queryKey: ['catalogo-reservas'],
     queryFn: async () => {
-      const [productosResultado, ubicacionesResultado, vendedorasResultado] = await Promise.all([
-        supabase.from('productos').select('id,codigo,nombre,tipo,unidad,piezas_por_caja').eq('activo', true).order('nombre'),
-        supabase.from('ubicaciones').select('id,nombre,tipo,vendible').eq('activa', true).eq('vendible', true).in('tipo', ['bodega', 'minibodega']).order('nombre'),
-        supabase.from('v_vendedoras_activas').select('id,nombre').order('nombre'),
+      const [productos, ubicaciones, vendedoras] = await Promise.all([
+        consultarTodas(() => supabase.from('productos')
+          .select('id,codigo,nombre,tipo,unidad,piezas_por_caja')
+          .eq('activo', true)
+          .order('nombre')
+          .order('id')),
+        consultarTodas(() => supabase.from('ubicaciones')
+          .select('id,nombre,tipo,vendible')
+          .eq('activa', true)
+          .eq('vendible', true)
+          .in('tipo', ['bodega', 'minibodega'])
+          .order('nombre')
+          .order('id')),
+        consultarTodas(() => supabase.from('v_vendedoras_activas')
+          .select('id,nombre')
+          .order('nombre')
+          .order('id')),
       ]);
       return {
-        productos: comprobar(productosResultado),
-        ubicaciones: comprobar(ubicacionesResultado),
-        vendedoras: comprobar(vendedorasResultado),
+        productos,
+        ubicaciones,
+        vendedoras,
       };
     },
   });
@@ -28,32 +37,36 @@ export function useStockReserva(ubicacionId) {
   return useQuery({
     queryKey: ['reservas', 'stock', ubicacionId],
     enabled: Boolean(ubicacionId),
-    queryFn: async () => comprobar(await supabase
+    queryFn: () => consultarTodas(() => supabase
       .from('v_stock')
       .select('producto_id,fisico,reservado,disponible')
-      .eq('ubicacion_id', ubicacionId)),
+      .eq('ubicacion_id', ubicacionId)
+      .order('producto_id')),
   });
 }
 
 async function consultarReservas() {
-  const reservas = comprobar(await supabase
+  const reservas = await consultarTodas(() => supabase
     .from('reservas')
     .select('id,producto_id,ubicacion_id,cantidad,vendedora_id,doc_venta_tipo,doc_venta_numero,estado,motivo_cancelacion,documento_id,creado_por,creado_en')
     .order('creado_en', { ascending: false })
-    .limit(500));
+    .order('id', { ascending: false }));
   if (reservas.length === 0) return [];
 
   const usuarioIds = [...new Set(reservas.flatMap((reserva) => [reserva.vendedora_id, reserva.creado_por]).filter(Boolean))];
   const productoIds = [...new Set(reservas.map((reserva) => reserva.producto_id))];
   const ubicacionIds = [...new Set(reservas.map((reserva) => reserva.ubicacion_id))];
-  const [usuariosResultado, productosResultado, ubicacionesResultado] = await Promise.all([
-    supabase.from('v_usuarios_nombres_operativos').select('id,nombre').in('id', usuarioIds),
-    supabase.from('productos').select('id,codigo,nombre,tipo,unidad,piezas_por_caja').in('id', productoIds),
-    supabase.from('ubicaciones').select('id,nombre').in('id', ubicacionIds),
+  const [usuarios, productos, ubicaciones] = await Promise.all([
+    consultarPorIds(usuarioIds, (ids) => supabase.from('v_usuarios_nombres_operativos')
+      .select('id,nombre')
+      .in('id', ids)),
+    consultarPorIds(productoIds, (ids) => supabase.from('productos')
+      .select('id,codigo,nombre,tipo,unidad,piezas_por_caja')
+      .in('id', ids)),
+    consultarPorIds(ubicacionIds, (ids) => supabase.from('ubicaciones')
+      .select('id,nombre')
+      .in('id', ids)),
   ]);
-  const usuarios = comprobar(usuariosResultado);
-  const productos = comprobar(productosResultado);
-  const ubicaciones = comprobar(ubicacionesResultado);
   const porUsuario = new Map(usuarios.map((usuario) => [usuario.id, usuario.nombre]));
   const porProducto = new Map(productos.map((producto) => [producto.id, producto]));
   const porUbicacion = new Map(ubicaciones.map((ubicacion) => [ubicacion.id, ubicacion.nombre]));

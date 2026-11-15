@@ -1,35 +1,30 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '../lib/supabase.js';
-
-function comprobar(resultado) {
-  if (resultado.error) throw resultado.error;
-  return resultado.data || [];
-}
+import { consultarPorIds, consultarTodas } from '../lib/consultarTodas.js';
 
 async function consultarAprobaciones() {
-  const { data: documentos, error } = await supabase
+  const documentos = await consultarTodas(() => supabase
     .from('documentos')
     .select('id,tipo,serie,anio,correlativo,fecha,motivo,es_contingencia,evidencia_url,doc_venta_tipo,doc_venta_numero,doc_proveedor_numero,creado_por,orden_pedido_id')
     .eq('estado', 'pendiente')
     .order('fecha', { ascending: true })
-    .limit(100);
-  if (error) throw error;
+    .order('id', { ascending: true }));
   if (documentos.length === 0) return [];
 
   const documentoIds = documentos.map((documento) => documento.id);
-  const [lineasResultado, usuariosResultado] = await Promise.all([
-    supabase
+  const usuarioIds = [...new Set(documentos.map((documento) => documento.creado_por).filter(Boolean))];
+  const [lineas, usuarios] = await Promise.all([
+    consultarPorIds(documentoIds, (ids) => supabase
       .from('detalle_documento')
       .select('id,documento_id,producto_id,ubicacion_origen_id,ubicacion_destino_id,cantidad,observacion')
-      .in('documento_id', documentoIds)
-      .order('id'),
-    supabase
+      .in('documento_id', ids)
+      .order('id')),
+    consultarPorIds(usuarioIds, (ids) => supabase
       .from('usuarios')
       .select('id,nombre')
-      .in('id', [...new Set(documentos.map((documento) => documento.creado_por))]),
+      .in('id', ids)
+      .order('id')),
   ]);
-  const lineas = comprobar(lineasResultado);
-  const usuarios = comprobar(usuariosResultado);
 
   const evidencias = await Promise.all(documentos.map(async (documento) => {
     const evidencia = documento.evidencia_url;
@@ -45,16 +40,16 @@ async function consultarAprobaciones() {
     linea.ubicacion_origen_id,
     linea.ubicacion_destino_id,
   ]).filter(Boolean))];
-  const [productosResultado, ubicacionesResultado] = await Promise.all([
-    productoIds.length
-      ? supabase.from('productos').select('id,codigo,nombre,tipo,unidad,piezas_por_caja').in('id', productoIds)
-      : Promise.resolve({ data: [], error: null }),
-    ubicacionIds.length
-      ? supabase.from('ubicaciones').select('id,nombre').in('id', ubicacionIds)
-      : Promise.resolve({ data: [], error: null }),
+  const [productos, ubicaciones] = await Promise.all([
+    consultarPorIds(productoIds, (ids) => supabase.from('productos')
+      .select('id,codigo,nombre,tipo,unidad,piezas_por_caja')
+      .in('id', ids)
+      .order('id')),
+    consultarPorIds(ubicacionIds, (ids) => supabase.from('ubicaciones')
+      .select('id,nombre')
+      .in('id', ids)
+      .order('id')),
   ]);
-  const productos = comprobar(productosResultado);
-  const ubicaciones = comprobar(ubicacionesResultado);
 
   const porProducto = new Map(productos.map((producto) => [producto.id, producto]));
   const porUbicacion = new Map(ubicaciones.map((ubicacion) => [ubicacion.id, ubicacion.nombre]));

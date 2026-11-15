@@ -1,16 +1,14 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '../lib/supabase.js';
+import { consultarTodas } from '../lib/consultarTodas.js';
 
 export function useUsuarios() {
   return useQuery({
     queryKey: ['usuarios'],
-    queryFn: async () => {
-      const { data, error } = await supabase.from('usuarios')
+    queryFn: () => consultarTodas(() => supabase.from('usuarios')
         .select('id,nombre,usuario,rol,activo,creado_en')
-        .order('nombre');
-      if (error) throw error;
-      return data || [];
-    },
+        .order('nombre')
+        .order('id')),
   });
 }
 

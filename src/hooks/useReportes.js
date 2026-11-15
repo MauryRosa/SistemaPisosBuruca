@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '../lib/supabase.js';
+import { consultarPorIds, consultarTodas } from '../lib/consultarTodas.js';
 
 const TIPOS_SALIDA = [
   'salida_venta', 'despacho_minibodega', 'merma', 'consumo_interno',
@@ -35,11 +36,17 @@ export function useCatalogoReportes() {
   return useQuery({
     queryKey: ['catalogo-reportes'],
     queryFn: async () => {
-      const [productosResultado, ubicacionesResultado] = await Promise.all([
-        supabase.from('productos').select('id,codigo,nombre,tipo,categoria,unidad,piezas_por_caja').order('nombre'),
-        supabase.from('ubicaciones').select('id,nombre,tipo').order('nombre'),
+      const [productos, ubicaciones] = await Promise.all([
+        consultarTodas(() => supabase.from('productos')
+          .select('id,codigo,nombre,tipo,categoria,unidad,piezas_por_caja')
+          .order('nombre')
+          .order('id')),
+        consultarTodas(() => supabase.from('ubicaciones')
+          .select('id,nombre,tipo')
+          .order('nombre')
+          .order('id')),
       ]);
-      return { productos: comprobar(productosResultado), ubicaciones: comprobar(ubicacionesResultado) };
+      return { productos, ubicaciones };
     },
   });
 }
@@ -75,14 +82,17 @@ export function useReporteMovimientos(tipo, desde, hasta) {
       const productoIds = [...new Set(detalles.map((detalle) => detalle.producto_id))];
       const ubicacionIds = [...new Set(detalles.flatMap((detalle) => [detalle.ubicacion_origen_id, detalle.ubicacion_destino_id]).filter(Boolean))];
       const creadorIds = [...new Set(documentos.map((documento) => documento.creado_por).filter(Boolean))];
-      const [productosResultado, ubicacionesResultado, usuariosResultado] = await Promise.all([
-        productoIds.length ? supabase.from('productos').select('id,codigo,nombre,tipo,unidad,piezas_por_caja').in('id', productoIds) : Promise.resolve({ data: [], error: null }),
-        ubicacionIds.length ? supabase.from('ubicaciones').select('id,nombre').in('id', ubicacionIds) : Promise.resolve({ data: [], error: null }),
-        creadorIds.length ? supabase.from('usuarios').select('id,nombre').in('id', creadorIds) : Promise.resolve({ data: [], error: null }),
+      const [productos, ubicaciones, usuarios] = await Promise.all([
+        consultarPorIds(productoIds, (ids) => supabase.from('productos')
+          .select('id,codigo,nombre,tipo,unidad,piezas_por_caja')
+          .in('id', ids)),
+        consultarPorIds(ubicacionIds, (ids) => supabase.from('ubicaciones')
+          .select('id,nombre')
+          .in('id', ids)),
+        consultarPorIds(creadorIds, (ids) => supabase.from('usuarios')
+          .select('id,nombre')
+          .in('id', ids)),
       ]);
-      const productos = comprobar(productosResultado);
-      const ubicaciones = comprobar(ubicacionesResultado);
-      const usuarios = comprobar(usuariosResultado);
       const porProducto = new Map(productos.map((producto) => [producto.id, producto]));
       const porUbicacion = new Map(ubicaciones.map((ubicacion) => [ubicacion.id, ubicacion.nombre]));
       const porUsuario = new Map(usuarios.map((usuario) => [usuario.id, usuario.nombre]));
@@ -108,11 +118,11 @@ export function useReporteBajoMinimo(activo = true) {
   return useQuery({
     queryKey: ['reportes', 'bajo-minimo'],
     enabled: activo,
-    queryFn: async () => comprobar(await supabase.from('v_stock_total')
+    queryFn: () => consultarTodas(() => supabase.from('v_stock_total')
       .select('producto_id,codigo,nombre,tipo,categoria,unidad,piezas_por_caja,fisico,reservado,disponible,stock_minimo')
       .eq('bajo_minimo', true)
       .order('disponible')
-      .limit(1000)),
+      .order('producto_id')),
   });
 }
 

@@ -13,6 +13,7 @@ const TIPOS = [
   ['mermas', 'Mermas'],
   ['bajo-minimo', 'Productos bajo mínimo'],
 ];
+const TAMANO_PAGINA_BAJO_MINIMO = 50;
 const NOMBRES_TIPO = {
   entrada_compra: 'Entrada de compra',
   entrada_devolucion_cliente: 'Devolución de cliente',
@@ -61,11 +62,19 @@ export default function Reportes() {
   const [hasta, setHasta] = useState(hoy);
   const [productoId, setProductoId] = useState('');
   const [ubicacionId, setUbicacionId] = useState('');
+  const [paginaBajoMinimo, setPaginaBajoMinimo] = useState(0);
   const catalogo = useCatalogoReportes();
   const movimientos = useReporteMovimientos(tipo, desde, hasta);
   const bajoMinimo = useReporteBajoMinimo(tipo === 'bajo-minimo');
   const kardex = useKardex(productoId, ubicacionId, desde, hasta);
   const filas = movimientos.data || [];
+  const filasBajoMinimo = bajoMinimo.data || [];
+  const paginasBajoMinimo = Math.ceil(filasBajoMinimo.length / TAMANO_PAGINA_BAJO_MINIMO);
+  const paginaBajoMinimoActual = Math.min(paginaBajoMinimo, Math.max(0, paginasBajoMinimo - 1));
+  const filasBajoMinimoVisibles = filasBajoMinimo.slice(
+    paginaBajoMinimoActual * TAMANO_PAGINA_BAJO_MINIMO,
+    (paginaBajoMinimoActual + 1) * TAMANO_PAGINA_BAJO_MINIMO,
+  );
   const productoKardex = kardex.data?.producto;
 
   const conteoResumen = useMemo(() => {
@@ -76,7 +85,7 @@ export default function Reportes() {
 
   function exportar() {
     if (tipo === 'bajo-minimo') {
-      const data = bajoMinimo.data || [];
+      const data = filasBajoMinimo;
       descargarCSV('productos-bajo-minimo.csv',
         ['Código', 'Producto', 'Categoría', 'Físico', 'Reservado', 'Disponible', 'Mínimo'],
         data.map((fila) => [fila.codigo, fila.nombre, fila.categoria, formatoStock(fila.fisico, fila), formatoStock(fila.reservado, fila), formatoStock(fila.disponible, fila), formatoStock(fila.stock_minimo, fila)]));
@@ -179,20 +188,33 @@ export default function Reportes() {
         <section className="card reportes__resultado">
           <header><h2>Productos bajo mínimo</h2><span>{conteoResumen} productos</span></header>
           {bajoMinimo.data?.length ? (
-            <div className="tabla-scroll">
-              <table className="table table--stack">
-                <thead><tr><th scope="col">Producto</th><th scope="col">Físico</th><th scope="col">Reservado</th><th scope="col">Disponible</th><th scope="col">Mínimo</th></tr></thead>
-                <tbody>{bajoMinimo.data.map((fila) => (
-                  <tr key={fila.producto_id}>
-                    <td><strong>{fila.nombre}</strong><small className="reportes__meta">{fila.codigo} · {fila.categoria}</small></td>
-                    <td data-label="Físico">{formatoStock(fila.fisico, fila)}</td>
-                    <td data-label="Reservado">{formatoStock(fila.reservado, fila)}</td>
-                    <td data-label="Disponible"><StatusBadge estado="bajo-minimo" texto={formatoStock(fila.disponible, fila)} /></td>
-                    <td data-label="Mínimo">{formatoStock(fila.stock_minimo, fila)}</td>
-                  </tr>
-                ))}</tbody>
-              </table>
-            </div>
+            <>
+              <div className="tabla-scroll">
+                <table className="table table--stack">
+                  <thead><tr><th scope="col">Producto</th><th scope="col">Físico</th><th scope="col">Reservado</th><th scope="col">Disponible</th><th scope="col">Mínimo</th></tr></thead>
+                  <tbody>{filasBajoMinimoVisibles.map((fila) => (
+                    <tr key={fila.producto_id}>
+                      <td><strong>{fila.nombre}</strong><small className="reportes__meta">{fila.codigo} · {fila.categoria}</small></td>
+                      <td data-label="Físico">{formatoStock(fila.fisico, fila)}</td>
+                      <td data-label="Reservado">{formatoStock(fila.reservado, fila)}</td>
+                      <td data-label="Disponible"><StatusBadge estado="bajo-minimo" texto={formatoStock(fila.disponible, fila)} /></td>
+                      <td data-label="Mínimo">{formatoStock(fila.stock_minimo, fila)}</td>
+                    </tr>
+                  ))}</tbody>
+                </table>
+              </div>
+              {paginasBajoMinimo > 1 && (
+                <nav className="reportes__paginacion" aria-label="Paginación de productos bajo mínimo">
+                  <button type="button" className="btn btn--secondary" onClick={() => setPaginaBajoMinimo(paginaBajoMinimoActual - 1)} disabled={paginaBajoMinimoActual === 0}>
+                    Anterior
+                  </button>
+                  <span>Página {paginaBajoMinimoActual + 1} de {paginasBajoMinimo}</span>
+                  <button type="button" className="btn btn--secondary" onClick={() => setPaginaBajoMinimo(paginaBajoMinimoActual + 1)} disabled={paginaBajoMinimoActual + 1 >= paginasBajoMinimo}>
+                    Siguiente
+                  </button>
+                </nav>
+              )}
+            </>
           ) : <EmptyState icon="check" title="Todos los productos están sobre su mínimo." />}
         </section>
       )}

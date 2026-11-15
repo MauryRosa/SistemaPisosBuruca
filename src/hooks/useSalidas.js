@@ -1,28 +1,30 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '../lib/supabase.js';
-
-function comprobar(resultado) {
-  if (resultado.error) throw resultado.error;
-  return resultado.data || [];
-}
+import { consultarPorIds, consultarTodas } from '../lib/consultarTodas.js';
 
 export function useCatalogoSalidas() {
   return useQuery({
     queryKey: ['catalogo-salidas'],
     queryFn: async () => {
-      const [productosResultado, ubicacionesResultado, comprasResultado] = await Promise.all([
-        supabase.from('productos').select('id,codigo,nombre,tipo,unidad,piezas_por_caja,despacho_por').eq('activo', true).order('nombre'),
-        supabase.from('ubicaciones').select('id,nombre,tipo').eq('activa', true).in('tipo', ['bodega', 'minibodega']).order('nombre'),
-        supabase.from('documentos')
+      const [productos, ubicaciones, compras] = await Promise.all([
+        consultarTodas(() => supabase.from('productos')
+          .select('id,codigo,nombre,tipo,unidad,piezas_por_caja,despacho_por')
+          .eq('activo', true)
+          .order('nombre')
+          .order('id')),
+        consultarTodas(() => supabase.from('ubicaciones')
+          .select('id,nombre,tipo')
+          .eq('activa', true)
+          .in('tipo', ['bodega', 'minibodega'])
+          .order('nombre')
+          .order('id')),
+        consultarTodas(() => supabase.from('documentos')
           .select('id,serie,anio,correlativo,fecha,doc_proveedor_numero,orden_pedido_id')
           .eq('tipo', 'entrada_compra')
           .eq('estado', 'aprobado')
           .order('fecha', { ascending: false })
-          .limit(200),
+          .order('id', { ascending: false })),
       ]);
-      const productos = comprobar(productosResultado);
-      const ubicaciones = comprobar(ubicacionesResultado);
-      const compras = comprobar(comprasResultado);
       return {
         productos,
         ubicaciones,
@@ -39,11 +41,12 @@ export function useStockSalida(ubicacionId) {
   return useQuery({
     queryKey: ['salidas', 'stock', ubicacionId],
     enabled: Boolean(ubicacionId),
-    queryFn: async () => comprobar(await supabase
+    queryFn: () => consultarTodas(() => supabase
       .from('v_stock')
       .select('producto_id,codigo,nombre,tipo,unidad,piezas_por_caja,fisico,reservado,disponible')
       .eq('ubicacion_id', ubicacionId)
-      .order('nombre')),
+      .order('nombre')
+      .order('producto_id')),
   });
 }
 
@@ -51,7 +54,7 @@ export function useReservasPorVenta(tipo, numero, ubicacionId) {
   return useQuery({
     queryKey: ['salidas', 'reservas', tipo, numero, ubicacionId],
     enabled: Boolean(tipo && numero.trim() && ubicacionId),
-    queryFn: async () => comprobar(await supabase
+    queryFn: () => consultarTodas(() => supabase
       .from('reservas')
       .select('id,producto_id,ubicacion_id,cantidad')
       .eq('estado', 'activa')
@@ -72,28 +75,26 @@ export function useDocumentoSalida(documentoId) {
         .eq('id', documentoId)
         .single();
       if (errorDocumento) throw errorDocumento;
-      const detalles = comprobar(await supabase.from('detalle_documento')
+      const detalles = await consultarTodas(() => supabase.from('detalle_documento')
         .select('id,producto_id,ubicacion_origen_id,ubicacion_destino_id,cantidad')
         .eq('documento_id', documentoId)
         .order('id'));
       const productoIds = [...new Set(detalles.map((detalle) => detalle.producto_id))];
       const ubicacionIds = [...new Set(detalles.flatMap((detalle) => [detalle.ubicacion_origen_id, detalle.ubicacion_destino_id]).filter(Boolean))];
       const [productosResultado, ubicacionesResultado, usuarioResultado] = await Promise.all([
-        productoIds.length
-          ? supabase.from('productos').select('id,codigo,nombre,tipo,unidad,piezas_por_caja').in('id', productoIds)
-          : Promise.resolve({ data: [], error: null }),
-        ubicacionIds.length
-          ? supabase.from('ubicaciones').select('id,nombre').in('id', ubicacionIds)
-          : Promise.resolve({ data: [], error: null }),
+        consultarPorIds(productoIds, (ids) => supabase.from('productos')
+          .select('id,codigo,nombre,tipo,unidad,piezas_por_caja')
+          .in('id', ids)),
+        consultarPorIds(ubicacionIds, (ids) => supabase.from('ubicaciones')
+          .select('id,nombre')
+          .in('id', ids)),
         documento.creado_por
           ? supabase.from('v_usuarios_nombres_operativos').select('id,nombre').eq('id', documento.creado_por).maybeSingle()
           : Promise.resolve({ data: null, error: null }),
       ]);
-      const productos = comprobar(productosResultado);
-      const ubicaciones = comprobar(ubicacionesResultado);
       if (usuarioResultado.error) throw usuarioResultado.error;
-      const porProducto = new Map(productos.map((producto) => [producto.id, producto]));
-      const porUbicacion = new Map(ubicaciones.map((ubicacion) => [ubicacion.id, ubicacion.nombre]));
+      const porProducto = new Map(productosResultado.map((producto) => [producto.id, producto]));
+      const porUbicacion = new Map(ubicacionesResultado.map((ubicacion) => [ubicacion.id, ubicacion.nombre]));
       return {
         documento: { ...documento, creador: usuarioResultado.data?.nombre || 'Usuario no disponible' },
         detalles: detalles.map((detalle) => ({

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import EmptyState from '../components/ui/EmptyState.jsx';
 import StatusBadge from '../components/ui/StatusBadge.jsx';
 import { useAprobaciones, useAprobarMovimiento, useRechazarMovimiento } from '../hooks/useAprobaciones.js';
-import { useAprobarConteo, useConteos } from '../hooks/useConteos.js';
+import { useAprobarConteo, useConteosPendientes } from '../hooks/useConteos.js';
 import { formatoStock } from '../lib/unidades.js';
 import '../css/aprobaciones.css';
 
@@ -21,6 +21,7 @@ const TIPOS = {
   ajuste_positivo: 'Ajuste positivo',
   ajuste_negativo: 'Ajuste negativo',
 };
+const TAMANO_PAGINA_APROBACIONES = 15;
 
 function fechaHora(valor) {
   return new Date(valor).toLocaleString('es-SV', {
@@ -60,12 +61,26 @@ export default function Aprobaciones() {
   const { data: documentos = [], isLoading, isError, refetch } = useAprobaciones();
   const aprobar = useAprobarMovimiento();
   const rechazar = useRechazarMovimiento();
-  const conteosQuery = useConteos();
+  const conteosQuery = useConteosPendientes();
   const aprobarConteo = useAprobarConteo();
-  const conteosPendientes = (conteosQuery.data || []).filter((conteo) => conteo.estado === 'pendiente');
+  const conteosPendientes = conteosQuery.data || [];
   const [motivos, setMotivos] = useState({});
   const [mensaje, setMensaje] = useState(null);
+  const [paginaMovimientos, setPaginaMovimientos] = useState(0);
+  const [paginaConteos, setPaginaConteos] = useState(0);
   const procesando = aprobar.isPending || rechazar.isPending;
+  const paginasMovimientos = Math.ceil(documentos.length / TAMANO_PAGINA_APROBACIONES);
+  const paginaMovimientosActual = Math.min(paginaMovimientos, Math.max(0, paginasMovimientos - 1));
+  const documentosVisibles = documentos.slice(
+    paginaMovimientosActual * TAMANO_PAGINA_APROBACIONES,
+    (paginaMovimientosActual + 1) * TAMANO_PAGINA_APROBACIONES,
+  );
+  const paginasConteos = Math.ceil(conteosPendientes.length / TAMANO_PAGINA_APROBACIONES);
+  const paginaConteosActual = Math.min(paginaConteos, Math.max(0, paginasConteos - 1));
+  const conteosVisibles = conteosPendientes.slice(
+    paginaConteosActual * TAMANO_PAGINA_APROBACIONES,
+    (paginaConteosActual + 1) * TAMANO_PAGINA_APROBACIONES,
+  );
 
   async function aprobarDocumento(documento) {
     setMensaje(null);
@@ -125,8 +140,9 @@ export default function Aprobaciones() {
       )}
 
       {!isLoading && !isError && documentos.length > 0 && (
-        <div className="aprobaciones__lista">
-          {documentos.map((documento) => {
+        <>
+          <div className="aprobaciones__lista">
+          {documentosVisibles.map((documento) => {
             const enlace = urlSegura(documento.evidencia_enlace);
             return (
               <article className="card aprobaciones__tarjeta" key={documento.id}>
@@ -230,7 +246,19 @@ export default function Aprobaciones() {
               </article>
             );
           })}
-        </div>
+          </div>
+          {paginasMovimientos > 1 && (
+            <nav className="aprobaciones__paginacion" aria-label="Paginación de movimientos pendientes">
+              <button className="btn btn--secondary" type="button" onClick={() => setPaginaMovimientos(paginaMovimientosActual - 1)} disabled={paginaMovimientosActual === 0}>
+                Anterior
+              </button>
+              <span>Página {paginaMovimientosActual + 1} de {paginasMovimientos}</span>
+              <button className="btn btn--secondary" type="button" onClick={() => setPaginaMovimientos(paginaMovimientosActual + 1)} disabled={paginaMovimientosActual + 1 >= paginasMovimientos}>
+                Siguiente
+              </button>
+            </nav>
+          )}
+        </>
       )}
 
       <section className="aprobaciones__conteos" aria-labelledby="aprobaciones-conteos-titulo">
@@ -251,8 +279,9 @@ export default function Aprobaciones() {
           <div className="card"><EmptyState title="No hay conteos físicos por aprobar." /></div>
         )}
         {!conteosQuery.isLoading && !conteosQuery.isError && conteosPendientes.length > 0 && (
-          <div className="aprobaciones__lista">
-            {conteosPendientes.map((conteo) => {
+          <>
+            <div className="aprobaciones__lista">
+            {conteosVisibles.map((conteo) => {
               const diferencias = conteo.detalles.filter((detalle) => detalle.diferencia !== 0);
               return (
                 <article className="card aprobaciones__tarjeta" key={conteo.id}>
@@ -305,7 +334,19 @@ export default function Aprobaciones() {
                 </article>
               );
             })}
-          </div>
+            </div>
+            {paginasConteos > 1 && (
+              <nav className="aprobaciones__paginacion" aria-label="Paginación de conteos pendientes">
+                <button className="btn btn--secondary" type="button" onClick={() => setPaginaConteos(paginaConteosActual - 1)} disabled={paginaConteosActual === 0}>
+                  Anterior
+                </button>
+                <span>Página {paginaConteosActual + 1} de {paginasConteos}</span>
+                <button className="btn btn--secondary" type="button" onClick={() => setPaginaConteos(paginaConteosActual + 1)} disabled={paginaConteosActual + 1 >= paginasConteos}>
+                  Siguiente
+                </button>
+              </nav>
+            )}
+          </>
         )}
       </section>
     </section>
