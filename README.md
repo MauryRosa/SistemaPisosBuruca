@@ -28,7 +28,7 @@ cp .env.example .env   # completar con la URL, la clave pública y el dominio in
 pnpm dev               # http://localhost:5173
 ```
 
-Para iniciar Supabase local, preparar el entorno alojado y revisar la lista previa a producción, consulta [Puesta en marcha](docs/PUESTA-EN-MARCHA.md).
+Para iniciar Supabase local, preparar el entorno alojado y revisar la lista previa a producción, consulta [Puesta en marcha](docs/PUESTA-EN-MARCHA.md). Lo que **falta** (migraciones sin desplegar en la base alojada, hosting, respaldos, mediciones y decisiones abiertas) está en [Pendientes](docs/PENDIENTES.md).
 La matriz de cobertura funcional y no funcional está en [Cobertura de requisitos](docs/COBERTURA-REQUERIMIENTOS.md).
 
 ## Scripts
