@@ -3,9 +3,10 @@
 ## Desarrollo local
 
 1. Instala Node.js, pnpm y Supabase CLI. Docker o Podman debe estar disponible para levantar los servicios locales.
-2. Inicia Supabase local y aplica las migraciones con el flujo de desarrollo documentado por [Supabase CLI](https://supabase.com/docs/guides/local-development/cli/getting-started).
-3. El reinicio local aplica `supabase/seed.sql`, que contiene datos de demostración y **no debe cargarse en producción**.
-4. Copia `.env.example` como `.env`. Configura la URL local, la clave pública y `VITE_AUTH_DOMAIN`; el dominio debe coincidir con `AUTH_DOMAIN` de la función `admin-usuarios`.
+2. Copia `.env.example` como `.env` y configura la URL local, la clave pública y `VITE_AUTH_DOMAIN`. Copia `supabase/functions/.env.example` como `supabase/functions/.env` para que el runtime local de Edge Functions reciba `AUTH_DOMAIN`. Ambos dominios deben coincidir. Los dos archivos `.env` quedan ignorados por Git.
+3. Inicia Supabase local con el flujo de desarrollo documentado por [Supabase CLI](https://supabase.com/docs/guides/local-development/cli/getting-started). Después ejecuta `supabase db reset` para aplicar las migraciones y el seed.
+4. El seed incluye datos y cuentas de demostración; **no debe cargarse en producción**.
+   - Cuentas locales: `admin`, `bodega` y `vendedora1`; contraseña de demostración: `DemoPisos2026!`. No reutilices esa contraseña fuera del entorno local.
 5. Instala dependencias y ejecuta `pnpm dev`.
 
 La clave `service_role` solo se configura como secreto del entorno de Supabase. No se coloca en `.env` del frontend.

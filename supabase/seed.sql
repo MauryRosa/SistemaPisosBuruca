@@ -2,7 +2,7 @@
 -- Datos de DEMOSTRACIÓN solo para el entorno local (supabase db reset).
 -- No usar en producción: el catálogo real se carga desde el Excel de la empresa
 -- y las cuentas reales las crea el administrador.
--- Contraseña de las cuentas demo: Demo1234!
+-- Contraseña de las cuentas demo: DemoPisos2026!
 -- =============================================================
 
 -- ---------- Cuentas demo en Supabase Auth ----------
@@ -23,7 +23,7 @@ begin
       confirmation_token, email_change, email_change_token_new, recovery_token
     ) values (
       '00000000-0000-0000-0000-000000000000', cuenta.id, 'authenticated', 'authenticated',
-      cuenta.usuario || '@pisosburuca.local', extensions.crypt('Demo1234!', extensions.gen_salt('bf')), now(),
+      cuenta.usuario || '@pisosburuca.local', extensions.crypt('DemoPisos2026!', extensions.gen_salt('bf')), now(),
       '{"provider":"email","providers":["email"]}', '{}', now(), now(), '', '', '', ''
     );
     insert into auth.identities (id, user_id, provider_id, identity_data, provider, last_sign_in_at, created_at, updated_at)
@@ -60,14 +60,14 @@ insert into public.productos (codigo, nombre, tipo, categoria, medida, unidad, p
   ('NIV-KIT', 'Niveladores de piso', 'accesorio', 'Niveladores', null, 'paquete', null, 'pieza', 15, 2),
   ('MAL-DUCHA', 'Malla para ducha', 'accesorio', 'Mallas', null, 'unidad', null, 'pieza', 10, 2);
 
--- ---------- Existencias iniciales (unidad base: piezas o unidades) ----------
+-- ---------- Saldos demo tras las ventas aprobadas (unidad base) ----------
 insert into public.existencias (producto_id, ubicacion_id, cantidad) values
-  (1, 1, 401), (1, 2, 24), (1, 3, 4),
+  (1, 1, 380), (1, 2, 24), (1, 3, 4),
   (2, 1, 21),  (2, 2, 6),
   (3, 1, 320), (3, 2, 16),
   (4, 1, 60),  (4, 2, 8),
   (5, 1, 240), (5, 2, 40), (5, 3, 8),
-  (6, 1, 45),  (6, 2, 10),
+  (6, 1, 40),  (6, 2, 10),
   (7, 1, 12),  (7, 2, 4),
   (8, 1, 60),
   (9, 1, 9),
@@ -79,10 +79,10 @@ insert into public.correlativos (serie, anio, ultimo_numero) values
   ('MER', extract(year from now())::int, 1);
 
 -- Flujo real: el documento nace pendiente, se agregan sus líneas y luego se aprueba
-insert into public.documentos (tipo, serie, anio, correlativo, doc_venta_tipo, doc_venta_numero, estado, creado_por, retira_nombre)
+insert into public.documentos (tipo, serie, anio, correlativo, doc_venta_tipo, doc_venta_numero, estado, creado_por, retira_nombre, placa)
 values
-  ('salida_venta', 'VTA', extract(year from now())::int, 1, 'factura', 'F-1001', 'pendiente', '22222222-2222-2222-2222-222222222222', 'Cliente demo'),
-  ('salida_venta', 'VTA', extract(year from now())::int, 2, 'recibo', 'R-2045', 'pendiente', '22222222-2222-2222-2222-222222222222', 'Transportista demo');
+  ('salida_venta', 'VTA', extract(year from now())::int, 1, 'factura', 'F-1001', 'pendiente', '22222222-2222-2222-2222-222222222222', 'Cliente demo', 'P123-456'),
+  ('salida_venta', 'VTA', extract(year from now())::int, 2, 'recibo', 'R-2045', 'pendiente', '22222222-2222-2222-2222-222222222222', 'Transportista demo', 'P789-012');
 insert into public.documentos (tipo, serie, anio, correlativo, estado, motivo, creado_por)
 values ('merma', 'MER', extract(year from now())::int, 1, 'pendiente', 'Caja quebrada al descargar', '22222222-2222-2222-2222-222222222222');
 

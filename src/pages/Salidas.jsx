@@ -537,8 +537,8 @@ export default function Salidas() {
                   <input className="input" required maxLength="160" value={retira} onChange={(event) => setRetira(event.target.value)} disabled={operacionPendiente} />
                 </label>
                 <label className="field">
-                  <span className="field__label">Placa <span className="salidas__opcional">(opcional)</span></span>
-                  <input className="input" maxLength="30" value={placa} onChange={(event) => setPlaca(event.target.value)} disabled={operacionPendiente} />
+                  <span className="field__label">Placa</span>
+                  <input className="input" required maxLength="30" value={placa} onChange={(event) => setPlaca(event.target.value)} disabled={operacionPendiente} />
                 </label>
               </>
             )}
